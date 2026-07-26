@@ -5,6 +5,7 @@ import '../models/savings_goal_model.dart';
 import '../theme/app_theme.dart';
 import '../utils/currency_formatter.dart';
 import '../widgets/sheets/notifikasi_sheet.dart';
+import '../widgets/sheets/tambah_dompet_sheet.dart';
 import '../widgets/animations/animated_empty_state.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -757,113 +758,6 @@ class _DompetScreenState extends State<DompetScreen> {
   }
 
   void _showAddWalletDialog() {
-    final nameController = TextEditingController();
-    final balanceController = TextEditingController();
-    String selectedType = 'Bank';
-    String colorHex = '#1A365D';
-    IconData iconData = Icons.account_balance;
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-            title: const Text('Tambah Dompet Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nama Akun / Dompet',
-                      hintText: 'Misal: Bank BCA, Gopay, OVO...',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: balanceController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
-                    decoration: InputDecoration(
-                      labelText: 'Saldo Awal (Rp)',
-                      hintText: '0',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Tipe Akun:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: ['Bank', 'E-Wallet', 'Dompet Fisik'].map((t) {
-                      final sel = selectedType == t;
-                      return ChoiceChip(
-                        label: Text(t),
-                        selected: sel,
-                        selectedColor: AppTheme.primaryContainer,
-                        labelStyle: TextStyle(color: sel ? AppTheme.textOnPrimary : AppTheme.textPrimary, fontSize: 12),
-                        onSelected: (_) => setDialogState(() {
-                          selectedType = t;
-                          if (t == 'E-Wallet') {
-                            iconData = Icons.account_balance_wallet;
-                            colorHex = '#00AED6';
-                          } else if (t == 'Dompet Fisik') {
-                            iconData = Icons.payments;
-                            colorHex = '#10B981';
-                          } else {
-                            iconData = Icons.account_balance;
-                            colorHex = '#1A365D';
-                          }
-                        }),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final name = nameController.text.trim();
-                  if (name.isNotEmpty) {
-                    final cleanBal = balanceController.text.replaceAll(RegExp(r'[^0-9]'), '');
-                    final bal = double.tryParse(cleanBal) ?? 0.0;
-                    AppState.instance.addWallet(WalletItem(
-                      name: name,
-                      type: selectedType,
-                      balance: bal,
-                      accountNumber: selectedType == 'Bank' ? 'Rekening' : 'Akun Utama',
-                      colorHex: colorHex,
-                      iconData: iconData,
-                    ));
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Dompet '$name' berhasil dihubungkan!"),
-                        backgroundColor: AppTheme.primary,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                child: const Text('Simpan Dompet', style: TextStyle(color: AppTheme.textOnPrimary)),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+    TambahDompetSheet.show(context);
   }
 }

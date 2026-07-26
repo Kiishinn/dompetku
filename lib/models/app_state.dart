@@ -49,13 +49,13 @@ class NotificationItem {
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
     return NotificationItem(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      message: json['message'] ?? '',
-      timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
-      isRead: json['isRead'] ?? false,
-      icon: IconData(json['iconCodePoint'] ?? Icons.notifications_active.codePoint, fontFamily: 'MaterialIcons'),
-      iconColor: Color(json['iconColorValue'] ?? AppTheme.primary.value),
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      message: json['message']?.toString() ?? '',
+      timestamp: json['timestamp'] != null ? (DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()) : DateTime.now(),
+      isRead: json['isRead'] == true,
+      icon: IconData((json['iconCodePoint'] as num?)?.toInt() ?? Icons.notifications_active.codePoint, fontFamily: 'MaterialIcons'),
+      iconColor: Color((json['iconColorValue'] as num?)?.toInt() ?? AppTheme.primary.value),
     );
   }
 }
@@ -125,10 +125,27 @@ class AppState extends ChangeNotifier {
       await StorageService.instance.saveCategories(_categories);
     }
 
-    final savedNotifsRaw = await StorageService.instance.loadNotificationsRaw();
-    if (savedNotifsRaw.isNotEmpty) {
-      _notifications = savedNotifsRaw.map((j) => NotificationItem.fromJson(j as Map<String, dynamic>)).toList();
-    } else {
+    try {
+      final savedNotifsRaw = await StorageService.instance.loadNotificationsRaw();
+      if (savedNotifsRaw.isNotEmpty) {
+        _notifications = savedNotifsRaw
+            .map((j) => NotificationItem.fromJson(Map<String, dynamic>.from(j as Map)))
+            .toList();
+      } else {
+        _notifications = [
+          NotificationItem(
+            id: 'notif_welcome',
+            title: 'Sistem Dompetku Aktif',
+            message: 'Notifikasi & Peringatan Overbudget telah aktif untuk memantau kesehatan finansial Anda.',
+            timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+            isRead: true,
+            icon: Icons.shield_outlined,
+            iconColor: AppTheme.primary,
+          ),
+        ];
+        await StorageService.instance.saveNotifications(_notifications);
+      }
+    } catch (_) {
       _notifications = [
         NotificationItem(
           id: 'notif_welcome',
@@ -140,7 +157,6 @@ class AppState extends ChangeNotifier {
           iconColor: AppTheme.primary,
         ),
       ];
-      await StorageService.instance.saveNotifications(_notifications);
     }
 
     _transactions = savedTxs;

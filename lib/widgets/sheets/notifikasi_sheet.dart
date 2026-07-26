@@ -37,7 +37,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
         final notifications = appState.notifications;
 
         return Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+          height: MediaQuery.of(context).size.height * 0.75,
           decoration: const BoxDecoration(
             color: AppTheme.surface,
             borderRadius: BorderRadius.only(
@@ -47,7 +47,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
           ),
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               // Handle Bar
               Center(
@@ -124,8 +124,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                         itemCount: notifications.length,
                         itemBuilder: (context, index) {
                           final item = notifications[index];
-                          final cleanTitle = item.title.replaceAll(RegExp(r'[^\x00-\x7F]+'), '').trim();
-                          final displayTitle = cleanTitle.isEmpty ? item.title : cleanTitle;
+                          final displayTitle = item.title;
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),
