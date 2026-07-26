@@ -68,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("🎉 Data cadangan JSON berhasil dipulihkan 100%!"),
+                      content: Text("Data cadangan JSON berhasil dipulihkan 100%!"),
                       backgroundColor: AppTheme.incomeGreen,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -76,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("⚠️ Format teks JSON tidak valid. Harap periksa kembali."),
+                      content: Text("Format teks JSON tidak valid. Harap periksa kembali."),
                       backgroundColor: AppTheme.expenseRed,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -266,7 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('✨ Profil berhasil diperbarui & tersimpan!'),
+                              content: Text('Profil berhasil diperbarui & tersimpan!'),
                               backgroundColor: AppTheme.incomeGreen,
                               behavior: SnackBarBehavior.floating,
                             ),
@@ -545,7 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   setSheetState(() {});
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
-                                                      content: Text("🗑️ Tagihan '${bill.title}' telah dihapus"),
+                                                      content: Text("Tagihan '${bill.title}' telah dihapus"),
                                                       backgroundColor: AppTheme.expenseRed,
                                                       behavior: SnackBarBehavior.floating,
                                                     ),
@@ -783,7 +783,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             setSheetState(() => isAddingNew = false);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("🎉 Tagihan '$title' berhasil ditambahkan!"),
+                                content: Text("Tagihan '$title' berhasil ditambahkan!"),
                                 backgroundColor: AppTheme.incomeGreen,
                                 behavior: SnackBarBehavior.floating,
                               ),
@@ -1344,7 +1344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             context: context,
                             builder: (confirmCtx) => AlertDialog(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text("⚠️ Reset Seluruh Data?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.expenseRed)),
+                              title: const Text("Reset Seluruh Data?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.expenseRed)),
                               content: const Text("Apakah Anda yakin ingin menghapus seluruh riwayat transaksi, mereset saldo dompet, dan mengembalikan profil ke awal? Tindakan ini tidak dapat dibatalkan."),
                               actions: [
                                 TextButton(
@@ -1357,7 +1357,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     AppState.instance.removeAllData();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text("🗑️ Seluruh data & profil telah di-reset dari awal!"),
+                                        content: Text("Seluruh data & profil telah di-reset dari awal!"),
                                         backgroundColor: AppTheme.expenseRed,
                                         behavior: SnackBarBehavior.floating,
                                       ),

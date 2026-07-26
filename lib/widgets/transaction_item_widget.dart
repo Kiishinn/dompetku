@@ -189,7 +189,7 @@ class TransactionItemWidget extends StatelessWidget {
                                                 children: [
                                                   Expanded(
                                                     child: Text(
-                                                      "🗑️ Transaksi '${transaction.title}' dihapus",
+                                                      "Transaksi '${transaction.title}' dihapus",
                                                       maxLines: 1,
                                                       overflow: TextOverflow.ellipsis,
                                                       style: const TextStyle(
@@ -359,14 +359,24 @@ class TransactionItemWidget extends StatelessWidget {
                     ),
                   ),
                   if (hasNote) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      '📝 ${transaction.note}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontStyle: FontStyle.italic,
-                        color: AppTheme.textSecondary,
-                      ),
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        const Icon(Icons.notes, size: 12, color: AppTheme.textSecondary),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            transaction.note,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ],

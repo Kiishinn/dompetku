@@ -15,6 +15,7 @@ class StorageService {
   static const String _keyBudgets = 'dompetku_budgets';
   static const String _keyCategories = 'dompetku_categories';
   static const String _keyNotifEnabled = 'dompetku_notif_enabled';
+  static const String _keyBalanceHidden = 'dompetku_balance_hidden';
 
   SharedPreferences? _prefs;
 
@@ -263,5 +264,15 @@ class StorageService {
   Future<void> saveFirstLaunchDone() async {
     await init();
     await _prefs?.setBool(_keyFirstLaunchDone, true);
+  }
+
+  Future<bool> loadBalanceHidden() async {
+    await init();
+    return _prefs?.getBool(_keyBalanceHidden) ?? false;
+  }
+
+  Future<void> saveBalanceHidden(bool hidden) async {
+    await init();
+    await _prefs?.setBool(_keyBalanceHidden, hidden);
   }
 }

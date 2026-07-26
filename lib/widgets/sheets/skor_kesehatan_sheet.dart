@@ -26,7 +26,6 @@ class SkorKesehatanSheet extends StatelessWidget {
         final categoryBudgets = appState.categoryBudgets;
         final totalIncome = appState.totalIncome;
         final totalExpense = appState.totalExpense;
-        final totalBalance = appState.totalBalance;
 
         final finalScore = customScore ?? appState.financialHealthScore;
         final scoreTitle = appState.financialHealthTitle;

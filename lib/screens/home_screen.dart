@@ -8,8 +8,6 @@ import '../widgets/animations/animated_empty_state.dart';
 import '../widgets/sheets/atur_anggaran_sheet.dart';
 import '../widgets/sheets/filter_transaksi_sheet.dart';
 import '../widgets/sheets/notifikasi_sheet.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 enum TimeRange { harian, mingguan, bulanan, tahunan, semua, custom }
 
@@ -25,14 +23,46 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TimeRange selectedPeriod = TimeRange.bulanan;
   DateTimeRange? customDateRange;
+  String _searchQuery = '';
+  final TextEditingController _searchCtrl = TextEditingController();
+
+  // Filter & Pagination state
+  String? _filterCategory;
+  String? _filterWallet;
+  int _visibleGroupCount = 3; // number of date groups to show
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
 
   List<TransactionModel> _getFilteredTransactions() {
     final allTx = widget.transactions ?? AppState.instance.transactions;
+    var list = allTx;
+    if (_searchQuery.trim().isNotEmpty) {
+      final q = _searchQuery.trim().toLowerCase();
+      list = list.where((tx) {
+        return tx.title.toLowerCase().contains(q) ||
+            tx.categoryName.toLowerCase().contains(q) ||
+            (tx.note.isNotEmpty && tx.note.toLowerCase().contains(q)) ||
+            (tx.walletName?.toLowerCase().contains(q) ?? false);
+      }).toList();
+    }
+
+    // Apply category & wallet filters
+    if (_filterCategory != null) {
+      list = list.where((tx) => tx.categoryName == _filterCategory).toList();
+    }
+    if (_filterWallet != null) {
+      list = list.where((tx) => tx.walletName == _filterWallet).toList();
+    }
+
     final now = DateTime.now();
 
     switch (selectedPeriod) {
       case TimeRange.harian:
-        return allTx.where((tx) {
+        return list.where((tx) {
           return tx.date.year == now.year &&
               tx.date.month == now.month &&
               tx.date.day == now.day;
@@ -40,24 +70,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
       case TimeRange.mingguan:
         final sevenDaysAgo = now.subtract(const Duration(days: 7));
-        return allTx.where((tx) => tx.date.isAfter(sevenDaysAgo)).toList();
+        return list.where((tx) => tx.date.isAfter(sevenDaysAgo)).toList();
 
       case TimeRange.bulanan:
-        return allTx.where((tx) {
+        return list.where((tx) {
           return tx.date.year == now.year && tx.date.month == now.month;
         }).toList();
 
       case TimeRange.tahunan:
-        return allTx.where((tx) => tx.date.year == now.year).toList();
+        return list.where((tx) => tx.date.year == now.year).toList();
 
       case TimeRange.semua:
-        return allTx;
+        return list;
 
       case TimeRange.custom:
-        if (customDateRange == null) return allTx;
+        if (customDateRange == null) return list;
         final start = customDateRange!.start;
         final end = customDateRange!.end.add(const Duration(days: 1));
-        return allTx.where((tx) {
+        return list.where((tx) {
           return tx.date.isAfter(start.subtract(const Duration(seconds: 1))) &&
               tx.date.isBefore(end);
         }).toList();
@@ -116,8 +146,19 @@ class _HomeScreenState extends State<HomeScreen> {
         final unreadNotifCount = appState.unreadNotificationCount;
 
         final filteredTxList = _getFilteredTransactions();
-        final periodIncome = filteredTxList.where((t) => (t.isIncome == true) && !t.isRealTransfer).fold(0.0, (s, t) => s + t.amount);
-        final periodExpense = filteredTxList.where((t) => (t.isIncome != true) && !t.isRealTransfer).fold(0.0, (s, t) => s + t.amount);
+        final periodIncome = filteredTxList.where((t) => (t.isIncome == true) && !t.isRealTransfer).fold<double>(0.0, (s, t) => s + t.amount);
+        final periodExpense = filteredTxList.where((t) => (t.isIncome != true) && !t.isRealTransfer).fold<double>(0.0, (s, t) => s + t.amount);
+
+        // Pre-filter list (before category/wallet filters) for deriving chip labels
+        final preFilterTxList = (() {
+          final saved = (_filterCategory, _filterWallet);
+          _filterCategory = null;
+          _filterWallet = null;
+          final result = _getFilteredTransactions();
+          _filterCategory = saved.$1;
+          _filterWallet = saved.$2;
+          return result;
+        })();
 
         return SafeArea(
           child: CustomScrollView(
@@ -212,74 +253,95 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const SizedBox(height: 4),
 
-                      // Total Saldo Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF1A365D), Color(0xFF0F2942)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                      // Total Saldo Card with Privacy Mode & RepaintBoundary Optimization
+                      RepaintBoundary(
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF1A365D), Color(0xFF0F2942)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: AppTheme.primaryCardShadow,
                           ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppTheme.primaryCardShadow,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'TOTAL SALDO',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textOnPrimary.withOpacity(0.8),
-                                letterSpacing: 1.2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'TOTAL SALDO',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppTheme.textOnPrimary.withOpacity(0.8),
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () => appState.toggleBalanceHidden(),
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(6),
+                                      child: Icon(
+                                        appState.isBalanceHidden ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                        color: AppTheme.textOnPrimary.withOpacity(0.85),
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 10,
-                              runSpacing: 6,
-                              children: [
-                                Text(
-                                  isDeficit
-                                      ? CurrencyFormatter.format(0, showPrefix: true)
-                                      : CurrencyFormatter.format(totalBalance, showPrefix: true),
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.textOnPrimary,
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                if (isDeficit)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.expenseRed.withOpacity(0.9),
-                                      borderRadius: BorderRadius.circular(20),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 10,
+                                runSpacing: 6,
+                                children: [
+                                  Text(
+                                    appState.isBalanceHidden
+                                        ? 'Rp •••••••••'
+                                        : (isDeficit
+                                            ? CurrencyFormatter.format(0, showPrefix: true)
+                                            : CurrencyFormatter.format(totalBalance, showPrefix: true)),
+                                    style: const TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.textOnPrimary,
+                                      letterSpacing: -0.5,
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 14),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          'Defisit -${CurrencyFormatter.format(totalBalance.abs(), showPrefix: true)}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
+                                  ),
+                                  if (isDeficit && !appState.isBalanceHidden)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.expenseRed.withOpacity(0.9),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 14),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Defisit -${CurrencyFormatter.format(totalBalance.abs(), showPrefix: true)}',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 
@@ -424,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    CurrencyFormatter.format(periodIncome, showPrefix: true),
+                                    appState.isBalanceHidden ? 'Rp ••••••' : CurrencyFormatter.format(periodIncome, showPrefix: true),
                                     style: const TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w700,
@@ -475,7 +537,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    CurrencyFormatter.format(periodExpense, showPrefix: true),
+                                    appState.isBalanceHidden ? 'Rp ••••••' : CurrencyFormatter.format(periodExpense, showPrefix: true),
                                     style: const TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w700,
@@ -667,13 +729,248 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
+                      // Universal Smart Search Bar
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
+                        ),
+                        child: TextField(
+                          controller: _searchCtrl,
+                          onChanged: (val) {
+                            setState(() {
+                              _searchQuery = val;
+                              _visibleGroupCount = 3;
+                            });
+                          },
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                          decoration: InputDecoration(
+                            hintText: 'Cari transaksi (judul, kategori, dompet)...',
+                            hintStyle: const TextStyle(fontSize: 13, color: AppTheme.textLight, fontWeight: FontWeight.w400),
+                            prefixIcon: const Icon(Icons.search, color: AppTheme.primary, size: 20),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear, size: 18, color: AppTheme.textSecondary),
+                                    onPressed: () {
+                                      _searchCtrl.clear();
+                                      setState(() {
+                                        _searchQuery = '';
+                                        _visibleGroupCount = 3;
+                                      });
+                                    },
+                                  )
+                                : null,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                        ),
+                      ),
+
+                      // Category & Wallet Filter Dropdowns
+                      if (preFilterTxList.isNotEmpty) ...[
+                        Builder(builder: (context) {
+                          final uniqueCategories = <String>{};
+                          final uniqueWallets = <String>{};
+                          for (final tx in preFilterTxList) {
+                            uniqueCategories.add(tx.categoryName);
+                            if (tx.walletName != null && tx.walletName!.isNotEmpty) {
+                              uniqueWallets.add(tx.walletName!);
+                            }
+                          }
+                          final categories = uniqueCategories.toList()..sort();
+                          final wallets = uniqueWallets.toList()..sort();
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: Row(
+                              children: [
+                                // Category Dropdown
+                                Expanded(
+                                  child: PopupMenuButton<String>(
+                                    onSelected: (value) {
+                                      setState(() {
+                                        _filterCategory = (value == '__ALL__') ? null : value;
+                                        _visibleGroupCount = 3;
+                                      });
+                                    },
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    color: AppTheme.surface,
+                                    elevation: 6,
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem<String>(
+                                        value: '__ALL__',
+                                        child: Row(
+                                          children: [
+                                            if (_filterCategory == null)
+                                              const Padding(
+                                                padding: EdgeInsets.only(right: 8),
+                                                child: Icon(Icons.check_circle, size: 16, color: AppTheme.primary),
+                                              ),
+                                            Text(
+                                              'Semua Kategori',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: _filterCategory == null ? FontWeight.bold : FontWeight.w500,
+                                                color: _filterCategory == null ? AppTheme.primary : AppTheme.textPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ...categories.map((cat) => PopupMenuItem<String>(
+                                        value: cat,
+                                        child: Row(
+                                          children: [
+                                            if (_filterCategory == cat)
+                                              const Padding(
+                                                padding: EdgeInsets.only(right: 8),
+                                                child: Icon(Icons.check_circle, size: 16, color: AppTheme.primary),
+                                              ),
+                                            Expanded(
+                                              child: Text(
+                                                cat,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: _filterCategory == cat ? FontWeight.bold : FontWeight.w500,
+                                                  color: _filterCategory == cat ? AppTheme.primary : AppTheme.textPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                    ],
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: _filterCategory != null ? AppTheme.primary.withOpacity(0.08) : AppTheme.surfaceContainerLow,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: _filterCategory != null ? AppTheme.primary.withOpacity(0.4) : AppTheme.outlineVariant.withOpacity(0.5),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.category_outlined, size: 16, color: _filterCategory != null ? AppTheme.primary : AppTheme.textSecondary),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              _filterCategory ?? 'Semua Kategori',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: _filterCategory != null ? FontWeight.bold : FontWeight.w500,
+                                                color: _filterCategory != null ? AppTheme.primary : AppTheme.textSecondary,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: _filterCategory != null ? AppTheme.primary : AppTheme.textSecondary),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                // Wallet Dropdown
+                                Expanded(
+                                  child: PopupMenuButton<String>(
+                                    onSelected: (value) {
+                                      setState(() {
+                                        _filterWallet = (value == '__ALL__') ? null : value;
+                                        _visibleGroupCount = 3;
+                                      });
+                                    },
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    color: AppTheme.surface,
+                                    elevation: 6,
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem<String>(
+                                        value: '__ALL__',
+                                        child: Row(
+                                          children: [
+                                            if (_filterWallet == null)
+                                              const Padding(
+                                                padding: EdgeInsets.only(right: 8),
+                                                child: Icon(Icons.check_circle, size: 16, color: AppTheme.accentBlue),
+                                              ),
+                                            Text(
+                                              'Semua Dompet',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: _filterWallet == null ? FontWeight.bold : FontWeight.w500,
+                                                color: _filterWallet == null ? AppTheme.accentBlue : AppTheme.textPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ...wallets.map((w) => PopupMenuItem<String>(
+                                        value: w,
+                                        child: Row(
+                                          children: [
+                                            if (_filterWallet == w)
+                                              const Padding(
+                                                padding: EdgeInsets.only(right: 8),
+                                                child: Icon(Icons.check_circle, size: 16, color: AppTheme.accentBlue),
+                                              ),
+                                            Expanded(
+                                              child: Text(
+                                                w,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: _filterWallet == w ? FontWeight.bold : FontWeight.w500,
+                                                  color: _filterWallet == w ? AppTheme.accentBlue : AppTheme.textPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                    ],
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: _filterWallet != null ? AppTheme.accentBlue.withOpacity(0.08) : AppTheme.surfaceContainerLow,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: _filterWallet != null ? AppTheme.accentBlue.withOpacity(0.4) : AppTheme.outlineVariant.withOpacity(0.5),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.account_balance_wallet_outlined, size: 16, color: _filterWallet != null ? AppTheme.accentBlue : AppTheme.textSecondary),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              _filterWallet ?? 'Semua Dompet',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: _filterWallet != null ? FontWeight.bold : FontWeight.w500,
+                                                color: _filterWallet != null ? AppTheme.accentBlue : AppTheme.textSecondary,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: _filterWallet != null ? AppTheme.accentBlue : AppTheme.textSecondary),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
                     ],
                   ),
                 ),
               ),
 
-              // Transaction List or Empty State for selected period
+              // Transaction List: Grouped by Date with Load More
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -682,37 +979,157 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icons.history_toggle_off,
                           title: allTransactions.isEmpty
                               ? "Belum Ada Transaksi"
-                              : "Tidak Ada Transaksi di Periode Ini",
+                              : "Tidak Ada Transaksi yang Cocok",
                           message: allTransactions.isEmpty
                               ? "Tekan tombol (+) di bawah untuk mencatat pengeluaran atau pemasukan pertama Anda!"
-                              : "Coba ganti filter periode di atas atau pilih rentang tanggal lain.",
+                              : "Coba ubah kata kunci pencarian atau ganti filter periode di atas.",
                         )
-                      : Container(
-                          decoration: BoxDecoration(
-                            color: AppTheme.surface,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: AppTheme.cardShadow,
-                          ),
-                          child: AnimationLimiter(
-                            child: Column(
-                              children: List.generate(
-                                filteredTxList.length > 5 ? 5 : filteredTxList.length,
-                                (index) => AnimationConfiguration.staggeredList(
-                                  position: index,
-                                  duration: const Duration(milliseconds: 375),
-                                  child: SlideAnimation(
-                                    verticalOffset: 20.0,
-                                    child: FadeInAnimation(
-                                      child: TransactionItemWidget(
-                                        transaction: filteredTxList[index],
-                                        showDivider: index != (filteredTxList.length - 1) && index != 4,
+                      : RepaintBoundary(
+                          child: Builder(builder: (context) {
+                            // Group transactions by date
+                            final now = DateTime.now();
+                            final Map<String, List<TransactionModel>> groupedTx = {};
+                            final Map<String, DateTime> groupDateMap = {};
+
+                            for (final tx in filteredTxList) {
+                              final dateKey = '${tx.date.year}-${tx.date.month.toString().padLeft(2, '0')}-${tx.date.day.toString().padLeft(2, '0')}';
+                              groupedTx.putIfAbsent(dateKey, () => []);
+                              groupedTx[dateKey]!.add(tx);
+                              groupDateMap.putIfAbsent(dateKey, () => DateTime(tx.date.year, tx.date.month, tx.date.day));
+                            }
+
+                            // Sort date keys descending (newest first)
+                            final sortedKeys = groupedTx.keys.toList()
+                              ..sort((a, b) => b.compareTo(a));
+
+                            final totalGroups = sortedKeys.length;
+                            final visibleKeys = sortedKeys.take(_visibleGroupCount).toList();
+
+                            String _dateGroupLabel(DateTime date) {
+                              final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+                              final yesterday = now.subtract(const Duration(days: 1));
+                              final isYesterday = date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day;
+                              final months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"];
+                              final days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
+                              final dayName = days[date.weekday - 1];
+
+                              if (isToday) return "HARI INI, ${date.day} ${months[date.month - 1]}";
+                              if (isYesterday) return "KEMARIN, ${date.day} ${months[date.month - 1]}";
+                              return "$dayName, ${date.day} ${months[date.month - 1]} ${date.year}".toUpperCase();
+                            }
+
+                            return Column(
+                              children: [
+                                ...visibleKeys.map((dateKey) {
+                                  final txGroup = groupedTx[dateKey]!;
+                                  final groupDate = groupDateMap[dateKey]!;
+                                  final label = _dateGroupLabel(groupDate);
+
+                                  // Sum for the date group
+                                  final dayIncome = txGroup.where((t) => t.isIncome == true && !t.isRealTransfer).fold<double>(0, (s, t) => s + t.amount);
+                                  final dayExpense = txGroup.where((t) => t.isIncome != true && !t.isRealTransfer).fold<double>(0, (s, t) => s + t.amount);
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 16),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Date Group Header
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 8),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                label,
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: AppTheme.textSecondary.withOpacity(0.7),
+                                                  letterSpacing: 0.8,
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  if (dayIncome > 0)
+                                                    Text(
+                                                      '+${CurrencyFormatter.format(dayIncome)}',
+                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.incomeGreen),
+                                                    ),
+                                                  if (dayIncome > 0 && dayExpense > 0)
+                                                    const Text(' / ', style: TextStyle(fontSize: 10, color: AppTheme.textLight)),
+                                                  if (dayExpense > 0)
+                                                    Text(
+                                                      '-${CurrencyFormatter.format(dayExpense)}',
+                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.expenseRed),
+                                                    ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Transaction cards for this date
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.surface,
+                                            borderRadius: BorderRadius.circular(16),
+                                            boxShadow: AppTheme.cardShadow,
+                                          ),
+                                          child: Column(
+                                            children: List.generate(txGroup.length, (i) {
+                                              return TransactionItemWidget(
+                                                transaction: txGroup[i],
+                                                showDivider: i != txGroup.length - 1,
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+
+                                // Load More Button
+                                if (_visibleGroupCount < totalGroups)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4, bottom: 8),
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _visibleGroupCount += 3;
+                                        });
+                                      },
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.surfaceContainerLow,
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(Icons.expand_more_rounded, color: AppTheme.primary, size: 20),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Muat Lebih Banyak (${totalGroups - _visibleGroupCount} grup lagi)',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppTheme.primary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ),
+                              ],
+                            );
+                          }),
                         ),
                 ),
               ),

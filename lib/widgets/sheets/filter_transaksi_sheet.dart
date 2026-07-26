@@ -256,7 +256,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                   case TimeRangeFilter.custom:
                     labelText = customDateRange != null
                         ? "${customDateRange!.start.day}/${customDateRange!.start.month} - ${customDateRange!.end.day}/${customDateRange!.end.month}"
-                        : "📅 Pilih Tanggal...";
+                        : "Pilih Tanggal...";
                     break;
                 }
 

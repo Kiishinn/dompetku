@@ -445,6 +445,32 @@ class _StatsScreenState extends State<StatsScreen> {
           projectedMonthTotal = (totalExpense / now.day) * daysCount;
         }
 
+        // AI Basic Insights: Proyeksi Kecepatan Habis Saldo (Burn-Rate Alarm)
+        final double dailyBurnRate = activePeriod == StatsPeriod.bulanan && now.year == selectedMonth.year && now.month == selectedMonth.month && now.day > 0
+            ? (totalExpense / now.day)
+            : (totalExpense / (daysCount > 0 ? daysCount : 1));
+        final int estimatedDaysLeft = dailyBurnRate > 0 ? (appState.totalBalance / dailyBurnRate).floor() : 999;
+        String burnRateStatus;
+        Color burnRateColor;
+        IconData burnRateIcon;
+        if (dailyBurnRate == 0) {
+          burnRateStatus = "Aman • Belum Ada Pengeluaran Berarti";
+          burnRateColor = AppTheme.incomeGreen;
+          burnRateIcon = Icons.verified_outlined;
+        } else if (estimatedDaysLeft < 15 && appState.totalBalance > 0) {
+          burnRateStatus = "Siaga • Saldo Habis dalam ~$estimatedDaysLeft Hari";
+          burnRateColor = AppTheme.expenseRed;
+          burnRateIcon = Icons.warning_amber_rounded;
+        } else if (appState.totalBalance <= 0) {
+          burnRateStatus = "Kritis • Saldo Defisit / Habis";
+          burnRateColor = AppTheme.expenseRed;
+          burnRateIcon = Icons.error_outline;
+        } else {
+          burnRateStatus = "Optimal • Bertahan ~$estimatedDaysLeft Hari (${CurrencyFormatter.format(dailyBurnRate)}/hr)";
+          burnRateColor = AppTheme.primary;
+          burnRateIcon = Icons.insights_outlined;
+        }
+
         return SafeArea(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -659,6 +685,62 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ).animate().fadeIn().slideY(begin: 0.1, duration: 300.ms),
 
+                const SizedBox(height: 18),
+
+                // AI Financial Insights: Burn-Rate Alarm Card
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [burnRateColor.withOpacity(0.12), AppTheme.surfaceContainerLow],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: burnRateColor.withOpacity(0.4), width: 1.2),
+                    boxShadow: AppTheme.cardShadow,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: burnRateColor.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(burnRateIcon, color: burnRateColor, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "AI ANALYTICS • BURN RATE",
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: burnRateColor, letterSpacing: 1.1),
+                                ),
+                                Text(
+                                  "Proyeksi",
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              burnRateStatus,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn().slideY(begin: 0.1, duration: 350.ms),
+
                 const SizedBox(height: 20),
 
                 // Toggle Tab (Pengeluaran vs Pemasukan) + Chart Type Selector
@@ -756,38 +838,40 @@ class _StatsScreenState extends State<StatsScreen> {
 
                 const SizedBox(height: 20),
 
-                // Chart View (BarChart or LineChart)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: AppTheme.cardShadow,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            activeChartType == ChartType.bar ? "Grafik Perbandingan" : "Grafik Tren Waktu",
-                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                          ),
-                          Text(
-                            CurrencyFormatter.format(currentTotal),
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isExpenseMode ? AppTheme.expenseRed : AppTheme.incomeGreen),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        height: 200,
-                        child: activeChartType == ChartType.bar
-                            ? _buildBarChart(modeTx, isExpenseMode)
-                            : _buildLineChart(modeTx, isExpenseMode),
-                      ),
-                    ],
+                // Chart View (BarChart or LineChart) with RepaintBoundary
+                RepaintBoundary(
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: AppTheme.cardShadow,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              activeChartType == ChartType.bar ? "Grafik Perbandingan" : "Grafik Tren Waktu",
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                            ),
+                            Text(
+                              CurrencyFormatter.format(currentTotal),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isExpenseMode ? AppTheme.expenseRed : AppTheme.incomeGreen),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          height: 200,
+                          child: activeChartType == ChartType.bar
+                              ? _buildBarChart(modeTx, isExpenseMode)
+                              : _buildLineChart(modeTx, isExpenseMode),
+                        ),
+                      ],
+                    ),
                   ),
                 ).animate().fadeIn().slideY(begin: 0.1, duration: 400.ms),
 

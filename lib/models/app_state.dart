@@ -68,6 +68,24 @@ class AppState extends ChangeNotifier {
   }
 
   bool isNotificationEnabled = true;
+  bool isBalanceHidden = false;
+
+  void toggleBalanceHidden() {
+    isBalanceHidden = !isBalanceHidden;
+    StorageService.instance.saveBalanceHidden(isBalanceHidden);
+    notifyListeners();
+  }
+
+  // Performance Optimization: Memoized calculation cache
+  final Map<String, double> _spentThisMonthCache = {};
+  double? _cachedTotalIncome;
+  double? _cachedTotalExpense;
+
+  void _invalidateCaches() {
+    _spentThisMonthCache.clear();
+    _cachedTotalIncome = null;
+    _cachedTotalExpense = null;
+  }
 
   // User Profile
   String userName = 'Pengguna Dompetku';
@@ -135,8 +153,10 @@ class AppState extends ChangeNotifier {
     isNotificationEnabled = notifEnabled;
     userName = userProfile['name'] ?? 'Pengguna Dompetku';
     userEmail = userProfile['email'] ?? 'Email belum diatur';
+    isBalanceHidden = await StorageService.instance.loadBalanceHidden();
     _autoPurgeOldNotifications();
     _checkRecurringBillNotifications();
+    _invalidateCaches();
     notifyListeners();
   }
 
@@ -273,8 +293,16 @@ class AppState extends ChangeNotifier {
   }
 
   double get totalBalance => _wallets.fold(0.0, (sum, item) => sum + item.balance);
-  double get totalIncome => _transactions.where((t) => (t.isIncome == true) && !t.isRealTransfer).fold(0.0, (sum, t) => sum + t.amount);
-  double get totalExpense => _transactions.where((t) => (t.isIncome != true) && !t.isRealTransfer).fold(0.0, (sum, t) => sum + t.amount);
+  double get totalIncome {
+    if (_cachedTotalIncome != null) return _cachedTotalIncome!;
+    _cachedTotalIncome = _transactions.where((t) => (t.isIncome == true) && !t.isRealTransfer).fold<double>(0.0, (double sum, t) => sum + (t.amount ?? 0.0));
+    return _cachedTotalIncome!;
+  }
+  double get totalExpense {
+    if (_cachedTotalExpense != null) return _cachedTotalExpense!;
+    _cachedTotalExpense = _transactions.where((t) => (t.isIncome != true) && !t.isRealTransfer).fold<double>(0.0, (double sum, t) => sum + (t.amount ?? 0.0));
+    return _cachedTotalExpense!;
+  }
 
   double get totalBudgetedLimit => _categoryBudgets.values.fold(0.0, (sum, v) => sum + v);
 
@@ -349,14 +377,19 @@ class AppState extends ChangeNotifier {
   }
 
   double getCategorySpentThisMonth(String categoryName) {
+    if (_spentThisMonthCache.containsKey(categoryName)) {
+      return _spentThisMonthCache[categoryName]!;
+    }
     final now = DateTime.now();
     final targetNorm = categoryName.toLowerCase().replaceAll('an', '').replaceAll(' ', '');
-    return _transactions.where((t) {
+    final spent = _transactions.where((t) {
       if (t.isIncome) return false;
       if (t.date.year != now.year || t.date.month != now.month) return false;
       final txNorm = t.categoryName.toLowerCase().replaceAll('an', '').replaceAll(' ', '');
       return txNorm == targetNorm || t.categoryName.toLowerCase() == categoryName.toLowerCase();
     }).fold(0.0, (sum, t) => sum + t.amount);
+    _spentThisMonthCache[categoryName] = spent;
+    return spent;
   }
 
   void setCategoryBudget(String categoryName, double limit) {
@@ -384,7 +417,7 @@ class AppState extends ChangeNotifier {
       if (!_notifications.any((n) => n.id == notifId)) {
         addNotification(NotificationItem(
           id: notifId,
-          title: '⚠️ Overbudget: $categoryName',
+          title: 'Overbudget: $categoryName',
           message: 'Pengeluaran [$categoryName] mencapai ${CurrencyFormatter.format(spent)} (Melampaui limit ${CurrencyFormatter.format(limit)} sebesar ${CurrencyFormatter.format(over)})!',
           timestamp: DateTime.now(),
           icon: Icons.error_outline,
@@ -397,7 +430,7 @@ class AppState extends ChangeNotifier {
       if (!_notifications.any((n) => n.id == notifId)) {
         addNotification(NotificationItem(
           id: notifId,
-          title: '🔔 Peringatan Anggaran ($percentInt%)',
+          title: 'Peringatan Anggaran ($percentInt%)',
           message: 'Pengeluaran [$categoryName] telah terpakai $percentInt% (${CurrencyFormatter.format(spent)} dari ${CurrencyFormatter.format(limit)}).',
           timestamp: DateTime.now(),
           icon: Icons.warning_amber_rounded,
@@ -524,7 +557,7 @@ class AppState extends ChangeNotifier {
     if (isNotificationEnabled) {
       addNotification(NotificationItem(
         id: 'notif_adj_${DateTime.now().millisecondsSinceEpoch}',
-        title: '✏️ Penyesuaian Saldo [$walletName]',
+        title: 'Penyesuaian Saldo [$walletName]',
         message: 'Saldo $walletName disesuaikan dari ${CurrencyFormatter.format(oldBal)} menjadi ${CurrencyFormatter.format(newActualBalance)}.',
         timestamp: DateTime.now(),
         icon: Icons.tune,
@@ -532,6 +565,7 @@ class AppState extends ChangeNotifier {
       ));
     }
 
+    _invalidateCaches();
     notifyListeners();
   }
 
@@ -597,6 +631,7 @@ class AppState extends ChangeNotifier {
       ));
     }
 
+    _invalidateCaches();
     notifyListeners();
   }
 
@@ -630,6 +665,7 @@ class AppState extends ChangeNotifier {
       checkBudgetAlertForCategory(tx.categoryName);
     }
 
+    _invalidateCaches();
     notifyListeners();
   }
 
@@ -696,6 +732,7 @@ class AppState extends ChangeNotifier {
     _transactions.removeAt(targetIdx);
     StorageService.instance.saveTransactions(_transactions);
     StorageService.instance.saveWallets(_wallets);
+    _invalidateCaches();
     notifyListeners();
   }
 
@@ -747,6 +784,7 @@ class AppState extends ChangeNotifier {
 
     StorageService.instance.saveTransactions(_transactions);
     StorageService.instance.saveWallets(_wallets);
+    _invalidateCaches();
     notifyListeners();
   }
 
@@ -792,6 +830,7 @@ class AppState extends ChangeNotifier {
     StorageService.instance.saveWallets(_wallets);
     StorageService.instance.saveCategoryBudgets(_categoryBudgets);
     StorageService.instance.saveUserProfile(userName, userEmail);
+    _invalidateCaches();
     notifyListeners();
   }
 }

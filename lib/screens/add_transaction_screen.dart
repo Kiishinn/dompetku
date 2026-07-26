@@ -289,19 +289,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (selectedTab == 2) {
       if (selectedWalletName == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("⚠️ Harap pilih dompet asal terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+          const SnackBar(content: Text("Harap pilih dompet asal terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
         );
         return;
       }
       if (targetWalletName == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("⚠️ Harap pilih dompet tujuan terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+          const SnackBar(content: Text("Harap pilih dompet tujuan terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
         );
         return;
       }
       if (selectedWalletName == targetWalletName) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("⚠️ Dompet asal dan dompet tujuan tidak boleh sama!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+          const SnackBar(content: Text("Dompet asal dan dompet tujuan tidak boleh sama!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
         );
         return;
       }
@@ -332,7 +332,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("⚠️ Harap pilih kategori transaksi terlebih dahulu!"),
+          content: Text("Harap pilih kategori transaksi terlebih dahulu!"),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
         ),
@@ -344,7 +344,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (selectedWalletName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("⚠️ Harap pilih dompet / sumber dana terlebih dahulu!"),
+          content: Text("Harap pilih dompet / sumber dana terlebih dahulu!"),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
         ),

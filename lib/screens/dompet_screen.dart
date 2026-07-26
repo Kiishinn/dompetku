@@ -66,8 +66,6 @@ class DompetScreen extends StatefulWidget {
 }
 
 class _DompetScreenState extends State<DompetScreen> {
-  bool isBalanceVisible = true;
-
   void _showAddSavingsGoalDialog() {
     final titleController = TextEditingController();
     final targetController = TextEditingController();
@@ -170,7 +168,7 @@ class _DompetScreenState extends State<DompetScreen> {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("🎉 Berhasil menyetor ${CurrencyFormatter.format(amount)} ke target ${goal.title}!"),
+                    content: Text("Berhasil menyetor ${CurrencyFormatter.format(amount)} ke target ${goal.title}!"),
                     backgroundColor: AppTheme.incomeGreen,
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -456,66 +454,70 @@ class _DompetScreenState extends State<DompetScreen> {
                 ),
               ),
 
-              // Summary Header Card
+              // Summary Header Card with RepaintBoundary
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1A365D), Color(0xFF0F2942)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: AppTheme.primaryCardShadow,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'TOTAL ASET DI SEMUA DOMPET',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white.withOpacity(0.8),
-                                letterSpacing: 1,
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () => setState(() => isBalanceVisible = !isBalanceVisible),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Icon(
-                                isBalanceVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                                color: Colors.white.withOpacity(0.8),
-                                size: 18,
-                              ),
-                            ),
-                          ],
+                  child: RepaintBoundary(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1A365D), Color(0xFF0F2942)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 10,
-                          runSpacing: 6,
-                          children: [
-                            Text(
-                              isBalanceVisible
-                                  ? (isDeficit ? CurrencyFormatter.format(0, showPrefix: true) : CurrencyFormatter.format(totalBalance, showPrefix: true))
-                                  : 'Rp •••••••••',
-                              style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: AppTheme.primaryCardShadow,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'TOTAL ASET DI SEMUA DOMPET',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white.withOpacity(0.8),
+                                  letterSpacing: 1,
+                                ),
                               ),
-                            ),
-                            if (isDeficit && isBalanceVisible)
-                              Container(
+                              InkWell(
+                                onTap: () => appState.toggleBalanceHidden(),
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Icon(
+                                    appState.isBalanceHidden ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    color: Colors.white.withOpacity(0.85),
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 10,
+                            runSpacing: 6,
+                            children: [
+                                Text(
+                                  !appState.isBalanceHidden
+                                      ? (isDeficit ? CurrencyFormatter.format(0, showPrefix: true) : CurrencyFormatter.format(totalBalance, showPrefix: true))
+                                      : 'Rp •••••••••',
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                if (isDeficit && !appState.isBalanceHidden)
+                                  Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: AppTheme.expenseRed.withOpacity(0.9),
@@ -562,8 +564,9 @@ class _DompetScreenState extends State<DompetScreen> {
                   ),
                 ),
               ),
+            ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
               // Section Title + Tambah Button
               SliverToBoxAdapter(
@@ -723,7 +726,7 @@ class _DompetScreenState extends State<DompetScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      isBalanceVisible
+                      !AppState.instance.isBalanceHidden
                           ? CurrencyFormatter.format(wallet.balance, showPrefix: true)
                           : 'Rp ••••••',
                       style: TextStyle(
