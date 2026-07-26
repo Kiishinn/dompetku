@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'transaction_model.dart';
 import 'category_model.dart';
+import 'savings_goal_model.dart';
+import 'recurring_bill_model.dart';
 import '../screens/dompet_screen.dart';
 import '../utils/currency_formatter.dart';
 import '../theme/app_theme.dart';
@@ -34,6 +36,28 @@ class NotificationItem {
     if (diff.inHours < 24) return '${diff.inHours} j yang lalu';
     return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'message': message,
+        'timestamp': timestamp.toIso8601String(),
+        'isRead': isRead,
+        'iconCodePoint': icon.codePoint,
+        'iconColorValue': iconColor.value,
+      };
+
+  factory NotificationItem.fromJson(Map<String, dynamic> json) {
+    return NotificationItem(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      message: json['message'] ?? '',
+      timestamp: json['timestamp'] != null ? DateTime.parse(json['timestamp']) : DateTime.now(),
+      isRead: json['isRead'] ?? false,
+      icon: IconData(json['iconCodePoint'] ?? Icons.notifications_active.codePoint, fontFamily: 'MaterialIcons'),
+      iconColor: Color(json['iconColorValue'] ?? AppTheme.primary.value),
+    );
+  }
 }
 
 class AppState extends ChangeNotifier {
@@ -45,6 +69,10 @@ class AppState extends ChangeNotifier {
 
   bool isNotificationEnabled = true;
 
+  // User Profile
+  String userName = 'Pengguna Dompetku';
+  String userEmail = 'Email belum diatur';
+
   // Reactive Category List (Re-orderable by User!)
   final List<CategoryModel> _categories = List.from(AppCategories.allCategories);
 
@@ -52,16 +80,7 @@ class AppState extends ChangeNotifier {
   Map<String, double> _categoryBudgets = {};
 
   // Notification items list
-  final List<NotificationItem> _notifications = [
-    NotificationItem(
-      id: 'notif_welcome',
-      title: 'Sistem Dompetku Aktif',
-      message: 'Notifikasi & Peringatan Overbudget telah aktif untuk memantau kesehatan finansial Anda.',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      icon: Icons.shield_outlined,
-      iconColor: AppTheme.primary,
-    ),
-  ];
+  List<NotificationItem> _notifications = [];
 
   // Initial state: empty transactions, starting clean!
   List<TransactionModel> _transactions = [];
@@ -74,11 +93,63 @@ class AppState extends ChangeNotifier {
     final savedWallets = await StorageService.instance.loadWallets();
     final savedBudgets = await StorageService.instance.loadCategoryBudgets();
     final notifEnabled = await StorageService.instance.loadNotificationEnabled();
+    final userProfile = await StorageService.instance.loadUserProfile();
+
+    final savedGoals = await StorageService.instance.loadSavingsGoals();
+    final savedBills = await StorageService.instance.loadRecurringBills();
+    final savedNotifiedKeys = await StorageService.instance.loadNotifiedKeys();
+
+    final savedNotifsRaw = await StorageService.instance.loadNotificationsRaw();
+    if (savedNotifsRaw.isNotEmpty) {
+      _notifications = savedNotifsRaw.map((j) => NotificationItem.fromJson(j as Map<String, dynamic>)).toList();
+    } else {
+      _notifications = [
+        NotificationItem(
+          id: 'notif_welcome',
+          title: 'Sistem Dompetku Aktif',
+          message: 'Notifikasi & Peringatan Overbudget telah aktif untuk memantau kesehatan finansial Anda.',
+          timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+          isRead: true,
+          icon: Icons.shield_outlined,
+          iconColor: AppTheme.primary,
+        ),
+      ];
+      await StorageService.instance.saveNotifications(_notifications);
+    }
 
     _transactions = savedTxs;
     _wallets = savedWallets;
     _categoryBudgets = savedBudgets;
+    _savingsGoals = savedGoals;
+    _recurringBills = savedBills.where((b) => b.id != 'rec_wifi' && b.id != 'rec_netflix').toList();
+    _notifiedKeys = savedNotifiedKeys;
+    await StorageService.instance.saveRecurringBills(_recurringBills);
     isNotificationEnabled = notifEnabled;
+    userName = userProfile['name'] ?? 'Pengguna Dompetku';
+    userEmail = userProfile['email'] ?? 'Email belum diatur';
+    _autoPurgeOldNotifications();
+    _checkRecurringBillNotifications();
+    notifyListeners();
+  }
+
+  void markAllNotificationsAsRead() {
+    for (var n in _notifications) {
+      n.isRead = true;
+    }
+    StorageService.instance.saveNotifications(_notifications);
+    notifyListeners();
+  }
+
+  void _autoPurgeOldNotifications() {
+    final now = DateTime.now();
+    _notifications.removeWhere((n) => now.difference(n.timestamp).inDays > 30);
+    StorageService.instance.saveNotifications(_notifications);
+  }
+
+  void updateUserProfile(String name, String email) {
+    userName = name;
+    userEmail = email;
+    StorageService.instance.saveUserProfile(name, email);
     notifyListeners();
   }
 
@@ -93,11 +164,159 @@ class AppState extends ChangeNotifier {
   List<NotificationItem> get notifications => List.unmodifiable(_notifications);
   int get unreadNotificationCount => _notifications.where((n) => !n.isRead).length;
 
+  // Savings Goals Impian List (Starts clean!)
+  List<SavingsGoalModel> _savingsGoals = [];
+
+  List<SavingsGoalModel> get savingsGoals => List.unmodifiable(_savingsGoals);
+
+  void addSavingsGoal(SavingsGoalModel goal) {
+    _savingsGoals.add(goal);
+    StorageService.instance.saveSavingsGoals(_savingsGoals);
+    notifyListeners();
+  }
+
+  void depositToSavingsGoal(String goalId, double amount) {
+    int idx = _savingsGoals.indexWhere((g) => g.id == goalId);
+    if (idx != -1) {
+      _savingsGoals[idx].currentAmount += amount;
+      StorageService.instance.saveSavingsGoals(_savingsGoals);
+      notifyListeners();
+    }
+  }
+
+  List<RecurringBillModel> _recurringBills = [];
+  List<String> _notifiedKeys = [];
+
+  void _checkRecurringBillNotifications() {
+    final now = DateTime.now();
+    bool hasNewNotif = false;
+    for (final bill in _recurringBills) {
+      if (bill.isActive && bill.dueDateDay == now.day) {
+        final notifId = 'notif_rec_${bill.id}_${now.day}_${now.month}_${now.year}';
+        
+        // 1. In-App Notification Center Sync (Always visible in Bell 🔔)
+        final existsInList = _notifications.any((n) => n.id == notifId);
+        if (!existsInList) {
+          final formattedAmount = CurrencyFormatter.format(bill.amount);
+          final titleStr = 'Pengingat Tagihan: ${bill.title}';
+          final msgStr = 'Tagihan ${bill.title} sebesar $formattedAmount jatuh tempo hari ini!';
+
+          _notifications.insert(
+            0,
+            NotificationItem(
+              id: notifId,
+              title: titleStr,
+              message: msgStr,
+              timestamp: now,
+              icon: Icons.update,
+              iconColor: bill.color,
+            ),
+          );
+          hasNewNotif = true;
+        }
+
+        // 2. Push Notification HP Lock (Rings ONLY 1x per day!)
+        if (!_notifiedKeys.contains(notifId)) {
+          _notifiedKeys.add(notifId);
+          StorageService.instance.saveNotifiedKeys(_notifiedKeys);
+
+          if (isNotificationEnabled) {
+            final formattedAmount = CurrencyFormatter.format(bill.amount);
+            final titleStr = 'Pengingat Tagihan: ${bill.title}';
+            final msgStr = 'Tagihan ${bill.title} sebesar $formattedAmount jatuh tempo hari ini!';
+
+            NotificationService.instance.showNotification(
+              id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+              title: titleStr,
+              body: msgStr,
+            );
+          }
+        }
+      }
+    }
+    if (hasNewNotif) {
+      StorageService.instance.saveNotifications(_notifications);
+    }
+  }
+
+  List<RecurringBillModel> get recurringBills => List.unmodifiable(_recurringBills);
+
+  void addRecurringBill(RecurringBillModel bill) {
+    _recurringBills.add(bill);
+    StorageService.instance.saveRecurringBills(_recurringBills);
+    _checkRecurringBillNotifications();
+    notifyListeners();
+  }
+
+  void toggleRecurringBill(String billId) {
+    int idx = _recurringBills.indexWhere((b) => b.id == billId);
+    if (idx != -1) {
+      _recurringBills[idx].isActive = !_recurringBills[idx].isActive;
+      StorageService.instance.saveRecurringBills(_recurringBills);
+      _checkRecurringBillNotifications();
+      notifyListeners();
+    }
+  }
+
+  void deleteRecurringBill(String billId) {
+    _recurringBills.removeWhere((b) => b.id == billId);
+    StorageService.instance.saveRecurringBills(_recurringBills);
+    notifyListeners();
+  }
+
   double get totalBalance => _wallets.fold(0.0, (sum, item) => sum + item.balance);
-  double get totalIncome => _transactions.where((t) => t.isIncome).fold(0.0, (sum, t) => sum + t.amount);
-  double get totalExpense => _transactions.where((t) => !t.isIncome).fold(0.0, (sum, t) => sum + t.amount);
+  double get totalIncome => _transactions.where((t) => (t.isIncome == true) && !t.isRealTransfer).fold(0.0, (sum, t) => sum + t.amount);
+  double get totalExpense => _transactions.where((t) => (t.isIncome != true) && !t.isRealTransfer).fold(0.0, (sum, t) => sum + t.amount);
 
   double get totalBudgetedLimit => _categoryBudgets.values.fold(0.0, (sum, v) => sum + v);
+
+  int get financialHealthScore {
+    if (totalIncome == 0 && totalExpense == 0) {
+      return 0; // Fresh install / no transactions yet
+    }
+
+    if (totalIncome > 0) {
+      final savings = totalIncome - totalExpense;
+      final savingsRatio = savings / totalIncome;
+
+      int points = 30; // base
+      if (savingsRatio >= 0.3) {
+        points += 40;
+      } else if (savingsRatio >= 0.1) {
+        points += 25;
+      } else if (savingsRatio > 0) {
+        points += 10;
+      } else {
+        points -= 15;
+      }
+
+      if (totalBalance > 0) points += 15;
+      if (totalBudgetedLimit > 0 && totalExpense <= totalBudgetedLimit) {
+        points += 14;
+      }
+
+      return points.clamp(35, 98);
+    } else if (totalExpense > 0) {
+      return 65;
+    }
+    return 0;
+  }
+
+  String get financialHealthTitle {
+    final score = financialHealthScore;
+    if (score == 0) return "Belum Teranalisis";
+    if (score >= 80) return "Sangat Sehat";
+    if (score >= 60) return "Cukup Baik";
+    return "Perlu Perhatian";
+  }
+
+  Color get financialHealthColor {
+    final score = financialHealthScore;
+    if (score == 0) return AppTheme.textSecondary;
+    if (score >= 80) return AppTheme.incomeGreen;
+    if (score >= 60) return AppTheme.warningAmber;
+    return AppTheme.expenseRed;
+  }
 
   void toggleNotifications(bool enabled) {
     isNotificationEnabled = enabled;
@@ -105,15 +324,9 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void markAllNotificationsAsRead() {
-    for (var n in _notifications) {
-      n.isRead = true;
-    }
-    notifyListeners();
-  }
-
   void addNotification(NotificationItem item) {
     _notifications.insert(0, item);
+    StorageService.instance.saveNotifications(_notifications);
     
     // Trigger System Native Notification Pop-up on Android/iOS Status Bar!
     if (isNotificationEnabled) {
@@ -257,6 +470,71 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void transferBetweenWallets({
+    required String fromWalletName,
+    required String toWalletName,
+    required double amount,
+    String? note,
+  }) {
+    int fromIdx = _wallets.indexWhere((w) => w.name == fromWalletName);
+    int toIdx = _wallets.indexWhere((w) => w.name == toWalletName);
+
+    if (fromIdx == -1 || toIdx == -1 || amount <= 0) return;
+
+    final fromW = _wallets[fromIdx];
+    final toW = _wallets[toIdx];
+
+    _wallets[fromIdx] = WalletItem(
+      name: fromW.name,
+      type: fromW.type,
+      balance: fromW.balance - amount,
+      accountNumber: fromW.accountNumber,
+      colorHex: fromW.colorHex,
+      iconData: fromW.iconData,
+    );
+
+    _wallets[toIdx] = WalletItem(
+      name: toW.name,
+      type: toW.type,
+      balance: toW.balance + amount,
+      accountNumber: toW.accountNumber,
+      colorHex: toW.colorHex,
+      iconData: toW.iconData,
+    );
+
+    final tx = TransactionModel(
+      id: 'tx_trf_${DateTime.now().millisecondsSinceEpoch}',
+      title: 'Transfer $fromWalletName ➔ $toWalletName',
+      categoryName: 'Transfer Dana',
+      walletName: fromWalletName,
+      amount: amount,
+      isIncome: false,
+      isTransfer: true,
+      icon: Icons.swap_horiz,
+      iconColor: AppTheme.accentBlue,
+      date: DateTime.now(),
+      timeText: '${TimeOfDay.now().hour.toString().padLeft(2, '0')}:${TimeOfDay.now().minute.toString().padLeft(2, '0')} WIB',
+      note: (note != null && note.trim().isNotEmpty) ? note.trim() : 'Transfer dana dari $fromWalletName ke $toWalletName.',
+    );
+
+    _transactions.insert(0, tx);
+    StorageService.instance.saveTransactions(_transactions);
+    StorageService.instance.saveWallets(_wallets);
+
+    if (isNotificationEnabled) {
+      addNotification(NotificationItem(
+        id: 'notif_trf_${DateTime.now().millisecondsSinceEpoch}',
+        title: 'Transfer Dana Berhasil',
+        message: 'Transfer ${CurrencyFormatter.format(amount)} dari $fromWalletName ke $toWalletName.',
+        timestamp: DateTime.now(),
+        icon: Icons.swap_horiz,
+        iconColor: AppTheme.accentBlue,
+      ));
+    }
+
+    notifyListeners();
+  }
+
   void addTransaction(TransactionModel tx) {
     _transactions.insert(0, tx); // Insert at top of list (latest first)
 
@@ -297,22 +575,111 @@ class AppState extends ChangeNotifier {
     final tx = _transactions[targetIdx];
 
     // Revert wallet balance changes
-    int wIdx = _wallets.indexWhere((w) => w.name == tx.walletName);
-    if (wIdx != -1) {
-      final w = _wallets[wIdx];
-      // If deleted tx was expense, add back amount. If income, subtract amount.
-      final newBal = tx.isIncome ? (w.balance - tx.amount) : (w.balance + tx.amount);
-      _wallets[wIdx] = WalletItem(
-        name: w.name,
-        type: w.type,
-        balance: newBal,
-        accountNumber: w.accountNumber,
-        colorHex: w.colorHex,
-        iconData: w.iconData,
-      );
+    if (tx.isRealTransfer) {
+      try {
+        final rawStr = tx.title.replaceFirst('Transfer ', '');
+        final parts = rawStr.split(' ➔ ');
+        if (parts.length == 2) {
+          final fromWalletName = parts[0].trim();
+          final toWalletName = parts[1].trim();
+
+          // Revert fromWallet (+ amount)
+          int fromIdx = _wallets.indexWhere((w) => w.name == fromWalletName);
+          if (fromIdx != -1) {
+            final w = _wallets[fromIdx];
+            _wallets[fromIdx] = WalletItem(
+              name: w.name,
+              type: w.type,
+              balance: w.balance + tx.amount,
+              accountNumber: w.accountNumber,
+              colorHex: w.colorHex,
+              iconData: w.iconData,
+            );
+          }
+
+          // Revert toWallet (- amount)
+          int toIdx = _wallets.indexWhere((w) => w.name == toWalletName);
+          if (toIdx != -1) {
+            final w = _wallets[toIdx];
+            _wallets[toIdx] = WalletItem(
+              name: w.name,
+              type: w.type,
+              balance: w.balance - tx.amount,
+              accountNumber: w.accountNumber,
+              colorHex: w.colorHex,
+              iconData: w.iconData,
+            );
+          }
+        }
+      } catch (_) {}
+    } else {
+      int wIdx = _wallets.indexWhere((w) => w.name == tx.walletName);
+      if (wIdx != -1) {
+        final w = _wallets[wIdx];
+        final newBal = tx.isIncome ? (w.balance - tx.amount) : (w.balance + tx.amount);
+        _wallets[wIdx] = WalletItem(
+          name: w.name,
+          type: w.type,
+          balance: newBal,
+          accountNumber: w.accountNumber,
+          colorHex: w.colorHex,
+          iconData: w.iconData,
+        );
+      }
     }
 
     _transactions.removeAt(targetIdx);
+    StorageService.instance.saveTransactions(_transactions);
+    StorageService.instance.saveWallets(_wallets);
+    notifyListeners();
+  }
+
+  void restoreTransaction(TransactionModel tx, [int? originalIndex]) {
+    if (_transactions.any((t) => t.id == tx.id)) return;
+
+    if (originalIndex != null && originalIndex >= 0 && originalIndex <= _transactions.length) {
+      _transactions.insert(originalIndex, tx);
+    } else {
+      _transactions.insert(0, tx);
+    }
+
+    if (tx.isRealTransfer) {
+      try {
+        final rawStr = tx.title.replaceFirst('Transfer ', '');
+        final parts = rawStr.split(' ➔ ');
+        if (parts.length == 2) {
+          final fromWalletName = parts[0].trim();
+          final toWalletName = parts[1].trim();
+
+          int fromIdx = _wallets.indexWhere((w) => w.name == fromWalletName);
+          if (fromIdx != -1) {
+            final w = _wallets[fromIdx];
+            _wallets[fromIdx] = WalletItem(name: w.name, type: w.type, balance: w.balance - tx.amount, accountNumber: w.accountNumber, colorHex: w.colorHex, iconData: w.iconData);
+          }
+
+          int toIdx = _wallets.indexWhere((w) => w.name == toWalletName);
+          if (toIdx != -1) {
+            final w = _wallets[toIdx];
+            _wallets[toIdx] = WalletItem(name: w.name, type: w.type, balance: w.balance + tx.amount, accountNumber: w.accountNumber, colorHex: w.colorHex, iconData: w.iconData);
+          }
+        }
+      } catch (_) {}
+    } else {
+      int wIdx = _wallets.indexWhere((w) => w.name == tx.walletName);
+      if (wIdx != -1) {
+        final w = _wallets[wIdx];
+        final newBal = tx.isIncome ? (w.balance + tx.amount) : (w.balance - tx.amount);
+        _wallets[wIdx] = WalletItem(
+          name: w.name,
+          type: w.type,
+          balance: newBal,
+          accountNumber: w.accountNumber,
+          colorHex: w.colorHex,
+          iconData: w.iconData,
+        );
+      }
+    }
+
     StorageService.instance.saveTransactions(_transactions);
     StorageService.instance.saveWallets(_wallets);
     notifyListeners();
@@ -327,6 +694,25 @@ class AppState extends ChangeNotifier {
   void addWallet(WalletItem wallet) {
     _wallets.add(wallet);
     StorageService.instance.saveWallets(_wallets);
+
+    if (wallet.balance > 0) {
+      final initialTx = TransactionModel(
+        id: 'tx_init_${DateTime.now().millisecondsSinceEpoch}',
+        title: 'Saldo Awal [${wallet.name}]',
+        categoryName: 'Gaji & Pendapatan',
+        walletName: wallet.name,
+        amount: wallet.balance,
+        isIncome: true,
+        icon: Icons.account_balance_wallet_outlined,
+        iconColor: AppTheme.incomeGreen,
+        date: DateTime.now(),
+        timeText: '${TimeOfDay.now().hour.toString().padLeft(2, '0')}:${TimeOfDay.now().minute.toString().padLeft(2, '0')} WIB',
+        note: 'Pemasukan otomatis saat membuat dompet ${wallet.name}.',
+      );
+      _transactions.insert(0, initialTx);
+      StorageService.instance.saveTransactions(_transactions);
+    }
+
     notifyListeners();
   }
 
@@ -335,9 +721,12 @@ class AppState extends ChangeNotifier {
     _wallets.clear();
     _categoryBudgets.clear();
     _notifications.clear();
+    userName = 'Pengguna Dompetku';
+    userEmail = 'Email belum diatur';
     StorageService.instance.saveTransactions(_transactions);
     StorageService.instance.saveWallets(_wallets);
     StorageService.instance.saveCategoryBudgets(_categoryBudgets);
+    StorageService.instance.saveUserProfile(userName, userEmail);
     notifyListeners();
   }
 }

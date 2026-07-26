@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -7,6 +9,30 @@ import '../utils/currency_formatter.dart';
 class ExportService {
   static final ExportService instance = ExportService._internal();
   ExportService._internal();
+
+  Future<void> exportCsvReport(List<TransactionModel> transactions) async {
+    final StringBuffer csvBuffer = StringBuffer();
+    // CSV Header
+    csvBuffer.writeln('Tanggal,Judul Transaksi,Kategori,Dompet,Jenis,Nominal (Rp)');
+
+    for (final t in transactions) {
+      final dateStr = '${t.date.day}/${t.date.month}/${t.date.year}';
+      final title = '"${t.title.replaceAll('"', '""')}"';
+      final category = '"${t.categoryName.replaceAll('"', '""')}"';
+      final wallet = '"${t.displayWallet.replaceAll('"', '""')}"';
+      final type = t.isIncome ? 'Pemasukan' : 'Pengeluaran';
+      final amount = t.amount.toStringAsFixed(0);
+
+      csvBuffer.writeln('$dateStr,$title,$category,$wallet,$type,$amount');
+    }
+
+    final Uint8List bytes = Uint8List.fromList(utf8.encode(csvBuffer.toString()));
+
+    await Printing.sharePdf(
+      bytes: bytes,
+      filename: 'Laporan_Dompetku_${DateTime.now().millisecondsSinceEpoch}.csv',
+    );
+  }
 
   Future<void> exportPdfReport(List<TransactionModel> transactions, double totalIncome, double totalExpense) async {
     final pdf = pw.Document();

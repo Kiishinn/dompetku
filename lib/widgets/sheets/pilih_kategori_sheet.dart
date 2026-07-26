@@ -6,15 +6,18 @@ import '../../theme/app_theme.dart';
 class PilihKategoriSheet extends StatefulWidget {
   final Function(CategoryModel) onSelectCategory;
   final VoidCallback? onAddNewCategoryClick;
+  final bool isExpense;
 
   const PilihKategoriSheet({
     super.key,
     required this.onSelectCategory,
     this.onAddNewCategoryClick,
+    this.isExpense = true,
   });
 
   static void show(BuildContext context, {
     required Function(CategoryModel) onSelectCategory,
+    bool isExpense = true,
     VoidCallback? onAddNewCategoryClick,
   }) {
     showModalBottomSheet(
@@ -23,43 +26,145 @@ class PilihKategoriSheet extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => PilihKategoriSheet(
         onSelectCategory: onSelectCategory,
+        isExpense: isExpense,
         onAddNewCategoryClick: onAddNewCategoryClick ?? () => _showAddCustomCategoryDialog(context, onSelectCategory),
       ),
     );
   }
 
-  static void _showAddCustomCategoryDialog(BuildContext context, Function(CategoryModel) onSelect) {
+  static void _showAddCustomCategoryDialog(
+    BuildContext context,
+    Function(CategoryModel) onSelect, {
+    bool defaultIsExpense = true,
+  }) {
     final TextEditingController nameController = TextEditingController();
     IconData selectedIcon = Icons.star;
     Color selectedColor = AppTheme.primary;
+    bool isExpenseType = defaultIsExpense;
+
+    final List<IconData> availableIcons = [
+      Icons.restaurant,
+      Icons.directions_car,
+      Icons.shopping_bag_outlined,
+      Icons.home_outlined,
+      Icons.work_outline,
+      Icons.laptop_chromebook,
+      Icons.card_giftcard,
+      Icons.trending_up,
+      Icons.sports_esports_outlined,
+      Icons.flight_takeoff,
+      Icons.medical_services_outlined,
+      Icons.school_outlined,
+      Icons.bolt,
+      Icons.local_gas_station,
+      Icons.pets,
+      Icons.star_outline,
+    ];
+
+    final List<Color> availableColors = [
+      AppTheme.primary,
+      AppTheme.incomeGreen,
+      AppTheme.expenseRed,
+      AppTheme.warningAmber,
+      AppTheme.purpleAccent,
+      AppTheme.pinkAccent,
+      AppTheme.accentBlue,
+      Colors.teal,
+    ];
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           backgroundColor: AppTheme.surface,
           title: const Text("Tambah Kategori Baru", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textPrimary)),
           content: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Category Type Switcher
+                const Text("Tipe Kategori:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setDialogState(() => isExpenseType = true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isExpenseType ? AppTheme.surface : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: isExpenseType ? AppTheme.cardShadow : null,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Pengeluaran',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setDialogState(() => isExpenseType = false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: !isExpenseType ? AppTheme.surface : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: !isExpenseType ? AppTheme.cardShadow : null,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Pemasukan',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: !isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Name Input
                 TextField(
                   controller: nameController,
                   decoration: InputDecoration(
                     labelText: "Nama Kategori",
-                    hintText: "Misal: Subscription, Investasi Crypto",
+                    hintText: isExpenseType ? "Misal: Langganan Netflix, Kopi" : "Misal: Komisi Jualan, Dividen",
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Icon Grid
                 const Text("Pilih Ikon:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
                 const SizedBox(height: 8),
                 Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [Icons.star, Icons.card_giftcard, Icons.bolt, Icons.local_gas_station, Icons.book, Icons.pets].map((ic) {
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: availableIcons.map((ic) {
                     final isSel = selectedIcon == ic;
                     return InkWell(
                       onTap: () => setDialogState(() => selectedIcon = ic),
@@ -69,19 +174,22 @@ class PilihKategoriSheet extends StatefulWidget {
                         decoration: BoxDecoration(
                           color: isSel ? AppTheme.primaryContainer : AppTheme.surfaceContainerLow,
                           borderRadius: BorderRadius.circular(10),
+                          border: isSel ? Border.all(color: AppTheme.primary, width: 2) : null,
                         ),
-                        child: Icon(ic, color: isSel ? AppTheme.textOnPrimary : AppTheme.primary),
+                        child: Icon(ic, color: isSel ? AppTheme.primary : AppTheme.textSecondary, size: 22),
                       ),
                     );
                   }).toList(),
                 ),
                 const SizedBox(height: 16),
+
+                // Color Swatches
                 const Text("Pilih Warna:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
-                  children: [AppTheme.primary, AppTheme.incomeGreen, AppTheme.expenseRed, AppTheme.warningAmber, AppTheme.purpleAccent, AppTheme.pinkAccent].map((col) {
+                  children: availableColors.map((col) {
                     final isSel = selectedColor == col;
                     return GestureDetector(
                       onTap: () => setDialogState(() => selectedColor = col),
@@ -115,6 +223,7 @@ class PilihKategoriSheet extends StatefulWidget {
                     icon: selectedIcon,
                     color: selectedColor,
                     group: CategoryGroup.gayaHidup,
+                    isExpense: isExpenseType,
                   );
                   AppState.instance.addCustomCategory(newCat);
                   Navigator.pop(ctx);
@@ -122,7 +231,7 @@ class PilihKategoriSheet extends StatefulWidget {
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-              child: const Text("Simpan", style: TextStyle(color: AppTheme.textOnPrimary)),
+              child: const Text("Simpan Kategori", style: TextStyle(color: AppTheme.textOnPrimary)),
             ),
           ],
         ),
@@ -130,7 +239,7 @@ class PilihKategoriSheet extends StatefulWidget {
     );
   }
 
-  static void _showReorderModal(BuildContext context) {
+  static void _showReorderModal(BuildContext context, {bool isExpense = true}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -159,9 +268,9 @@ class PilihKategoriSheet extends StatefulWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Urutkan Kategori",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                Text(
+                  isExpense ? "Urutkan Kategori Pengeluaran" : "Urutkan Kategori Pemasukan",
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
@@ -179,11 +288,15 @@ class PilihKategoriSheet extends StatefulWidget {
               child: ListenableBuilder(
                 listenable: AppState.instance,
                 builder: (context, _) {
-                  final categories = AppState.instance.categories;
+                  final categories = isExpense
+                      ? AppState.instance.categories.where((c) => c.isExpense != false).toList()
+                      : AppCategories.incomeCategories;
                   return ReorderableListView.builder(
                     itemCount: categories.length,
                     onReorder: (oldIndex, newIndex) {
-                      AppState.instance.reorderCategories(oldIndex, newIndex);
+                      if (isExpense) {
+                        AppState.instance.reorderCategories(oldIndex, newIndex);
+                      }
                     },
                     itemBuilder: (context, index) {
                       final cat = categories[index];
@@ -236,6 +349,13 @@ class PilihKategoriSheet extends StatefulWidget {
 
 class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
   String searchQuery = "";
+  late bool currentIsExpense;
+
+  @override
+  void initState() {
+    super.initState();
+    currentIsExpense = widget.isExpense;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +396,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
               Row(
                 children: [
                   InkWell(
-                    onTap: () => PilihKategoriSheet._showReorderModal(context),
+                    onTap: () => PilihKategoriSheet._showReorderModal(context, isExpense: currentIsExpense),
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -301,6 +421,66 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                 ],
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+
+          // Segmented Switcher: Pengeluaran vs Pemasukan inside Sheet!
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => currentIsExpense = true),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: currentIsExpense ? AppTheme.surface : Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: currentIsExpense ? AppTheme.cardShadow : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Pengeluaran',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: currentIsExpense ? AppTheme.textPrimary : AppTheme.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => currentIsExpense = false),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: !currentIsExpense ? AppTheme.surface : Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: !currentIsExpense ? AppTheme.cardShadow : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Pemasukan',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: !currentIsExpense ? AppTheme.textPrimary : AppTheme.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -329,7 +509,9 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
               child: ListenableBuilder(
                 listenable: AppState.instance,
                 builder: (context, _) {
-                  final categories = AppState.instance.categories;
+                  final categories = currentIsExpense
+                      ? AppState.instance.categories.where((c) => c.isExpense != false).toList()
+                      : AppCategories.incomeCategories;
                   final filteredCats = categories.where((cat) {
                     return searchQuery.isEmpty || cat.name.toLowerCase().contains(searchQuery);
                   }).toList();

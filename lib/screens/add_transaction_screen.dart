@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import '../utils/currency_formatter.dart';
 import '../widgets/sheets/pilih_kategori_sheet.dart';
 import '../widgets/dialogs/success_animation_dialog.dart';
+import '../widgets/sheets/pilih_jam_sheet.dart';
 import '../screens/dompet_screen.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -17,11 +18,14 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  int selectedTab = 0;
   bool isExpense = true;
+  bool isRecurring = false;
   CategoryModel? selectedCategory; // Default null (mandatory selection!)
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   String? selectedWalletName;
+  String? targetWalletName;
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
@@ -31,10 +35,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    final wallets = AppState.instance.wallets;
-    if (wallets.isNotEmpty) {
-      selectedWalletName = wallets[0].name;
-    }
+    // Default null: User must explicitly choose source wallet!
   }
 
   @override
@@ -46,9 +47,26 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.dispose();
   }
 
+  void _addShortcutNominal(double addAmount) {
+    if (addAmount == 0) {
+      nominalController.text = '';
+      return;
+    }
+    final cleanStr = nominalController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final currentVal = double.tryParse(cleanStr) ?? 0.0;
+    final newVal = (currentVal + addAmount).toInt();
+    final formatted = CurrencyFormatter.formatRawDigits(newVal.toString());
+    nominalController.value = TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+
   void _openCategorySelect() {
+    FocusScope.of(context).unfocus();
     PilihKategoriSheet.show(
       context,
+      isExpense: isExpense,
       onSelectCategory: (cat) {
         setState(() {
           selectedCategory = cat;
@@ -58,6 +76,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Future<void> _pickDateAndTime() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -80,116 +100,134 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     if (pickedDate != null) {
       if (!mounted) return;
-      final pickedTime = await showTimePicker(
-        context: context,
+      FocusScope.of(context).unfocus();
+      await Future.delayed(const Duration(milliseconds: 80));
+      if (!mounted) return;
+      FocusScope.of(context).unfocus();
+      PilihJamSheet.show(
+        context,
         initialTime: selectedTime,
-        builder: (context, child) {
-          return Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: const ColorScheme.light(
-                primary: AppTheme.primary,
-                onPrimary: Colors.white,
-                surface: AppTheme.surface,
-                onSurface: AppTheme.textPrimary,
-              ),
-            ),
-            child: child!,
-          );
+        onTimeSelected: (pickedTime) {
+          setState(() {
+            selectedTime = pickedTime;
+            selectedDate = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
+          });
         },
       );
-
-      if (pickedTime != null) {
-        setState(() {
-          selectedTime = pickedTime;
-          selectedDate = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-        });
-      } else {
-        setState(() {
-          selectedDate = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
-        });
-      }
     }
   }
 
   void _showAddQuickWalletDialog() {
+    FocusScope.of(context).unfocus();
     final nameController = TextEditingController();
     final balanceController = TextEditingController();
     String selectedType = 'Bank';
+    String colorHex = '#1A365D';
+    IconData iconData = Icons.account_balance;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Tambah Dompet Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Nama Akun / Dompet',
-                hintText: 'Misal: Bank BCA, Gopay...',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            title: const Text('Tambah Dompet Baru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nama Akun / Dompet',
+                      hintText: 'Misal: Bank BCA, Gopay, OVO...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: balanceController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
+                    decoration: InputDecoration(
+                      labelText: 'Saldo Awal (Rp)',
+                      hintText: '0',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Tipe Akun:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: ['Bank', 'E-Wallet', 'Dompet Fisik'].map((t) {
+                      final sel = selectedType == t;
+                      return ChoiceChip(
+                        label: Text(t),
+                        selected: sel,
+                        selectedColor: AppTheme.primaryContainer,
+                        labelStyle: TextStyle(color: sel ? AppTheme.textOnPrimary : AppTheme.textPrimary, fontSize: 12),
+                        onSelected: (_) => setDialogState(() {
+                          selectedType = t;
+                          if (t == 'E-Wallet') {
+                            iconData = Icons.account_balance_wallet;
+                            colorHex = '#00AED6';
+                          } else if (t == 'Dompet Fisik') {
+                            iconData = Icons.payments;
+                            colorHex = '#10B981';
+                          } else {
+                            iconData = Icons.account_balance;
+                            colorHex = '#1A365D';
+                          }
+                        }),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: balanceController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
-              decoration: InputDecoration(
-                labelText: 'Saldo Awal (Rp)',
-                hintText: '0',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary)),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final name = nameController.text.trim();
-              if (name.isNotEmpty) {
-                final cleanBal = balanceController.text.replaceAll(RegExp(r'[^0-9]'), '');
-                final bal = double.tryParse(cleanBal) ?? 0.0;
-                final newWallet = WalletItem(
-                  name: name,
-                  type: selectedType,
-                  balance: bal,
-                  accountNumber: 'Akun Utama',
-                  colorHex: '#1A365D',
-                  iconData: Icons.account_balance,
-                );
-                AppState.instance.addWallet(newWallet);
-                setState(() {
-                  selectedWalletName = name;
-                });
-                Navigator.pop(ctx);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: const Text('Simpan', style: TextStyle(color: AppTheme.textOnPrimary)),
-          ),
-        ],
+              ElevatedButton(
+                onPressed: () {
+                  final name = nameController.text.trim();
+                  if (name.isNotEmpty) {
+                    final cleanBal = balanceController.text.replaceAll(RegExp(r'[^0-9]'), '');
+                    final bal = double.tryParse(cleanBal) ?? 0.0;
+                    final newWallet = WalletItem(
+                      name: name,
+                      type: selectedType,
+                      balance: bal,
+                      accountNumber: selectedType == 'Bank' ? 'Rekening' : 'Akun Utama',
+                      colorHex: colorHex,
+                      iconData: iconData,
+                    );
+                    AppState.instance.addWallet(newWallet);
+                    setState(() {
+                      selectedWalletName = name;
+                    });
+                    Navigator.pop(ctx);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: const Text('Simpan Dompet', style: TextStyle(color: AppTheme.textOnPrimary)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -248,6 +286,48 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
+    if (selectedTab == 2) {
+      if (selectedWalletName == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Harap pilih dompet asal terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+        );
+        return;
+      }
+      if (targetWalletName == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Harap pilih dompet tujuan terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+        );
+        return;
+      }
+      if (selectedWalletName == targetWalletName) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Dompet asal dan dompet tujuan tidak boleh sama!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+        );
+        return;
+      }
+
+      final String transferNote = noteController.text.trim().isNotEmpty
+          ? noteController.text.trim()
+          : 'Transfer dana dari $selectedWalletName ke $targetWalletName.';
+
+      AppState.instance.transferBetweenWallets(
+        fromWalletName: selectedWalletName!,
+        toWalletName: targetWalletName!,
+        amount: amount,
+        note: transferNote,
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      SuccessAnimationDialog.show(
+        context,
+        title: 'Transfer Dana Berhasil!',
+        message: "Transfer sebesar ${CurrencyFormatter.format(amount)} dari [$selectedWalletName] ke [$targetWalletName] berhasil disimpan.",
+      );
+      return;
+    }
+
     // MANDATORY CATEGORY VALIDATION
     if (selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -260,7 +340,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
-    final targetWallet = selectedWalletName ?? AppState.instance.wallets[0].name;
+    // MANDATORY WALLET SELECTION VALIDATION
+    if (selectedWalletName == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("⚠️ Harap pilih dompet / sumber dana terlebih dahulu!"),
+          backgroundColor: AppTheme.expenseRed,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final targetWallet = selectedWalletName!;
 
     // OPSI 1: DEFICIT WARNING CONFIRMATION DIALOG IF EXPENSE > CURRENT WALLET BALANCE
     if (isExpense) {
@@ -325,6 +417,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       date: selectedDate,
       timeText: '$formattedHour:$formattedMinute WIB',
       note: noteController.text.trim(),
+      isRecurring: isRecurring,
     );
 
     AppState.instance.addTransaction(newTx);
@@ -334,8 +427,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
     SuccessAnimationDialog.show(
       context,
-      title: 'Transaksi Berhasil!',
-      message: "Transaksi '${newTx.title}' sebesar ${CurrencyFormatter.format(newTx.amount)} disetor ke [$targetWallet].",
+      title: isExpense ? 'Pengeluaran Dicatat!' : 'Pemasukan Berhasil!',
+      message: isExpense
+          ? "Transaksi '${newTx.title}' sebesar ${CurrencyFormatter.format(newTx.amount)} berhasil dikeluarkan dari [$targetWallet]."
+          : "Transaksi '${newTx.title}' sebesar ${CurrencyFormatter.format(newTx.amount)} berhasil disetor ke [$targetWallet].",
     );
   }
 
@@ -374,7 +469,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Segmented Switcher: Pengeluaran vs Pemasukan
+              // 3-Tab Segmented Switcher: Pengeluaran vs Pemasukan vs Transfer
               Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -387,28 +482,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
+                            selectedTab = 0;
                             isExpense = true;
-                            if (selectedCategory != null &&
-                                (selectedCategory!.name.toLowerCase() == 'pendapatan' ||
-                                    selectedCategory!.name.toLowerCase() == 'gaji')) {
-                              selectedCategory = null;
-                            }
+                            selectedCategory = null;
                           });
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: isExpense ? AppTheme.surface : Colors.transparent,
+                            color: selectedTab == 0 ? AppTheme.surface : Colors.transparent,
                             borderRadius: BorderRadius.circular(20),
-                            boxShadow: isExpense ? AppTheme.cardShadow : null,
+                            boxShadow: selectedTab == 0 ? AppTheme.cardShadow : null,
                           ),
                           child: Center(
                             child: Text(
                               'Pengeluaran',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: isExpense ? AppTheme.textPrimary : AppTheme.textSecondary,
+                                color: selectedTab == 0 ? AppTheme.textPrimary : AppTheme.textSecondary,
                               ),
                             ),
                           ),
@@ -419,24 +511,53 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
+                            selectedTab = 1;
                             isExpense = false;
-                            selectedCategory = null; // Do not auto select any category!
+                            selectedCategory = null;
                           });
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: !isExpense ? AppTheme.surface : Colors.transparent,
+                            color: selectedTab == 1 ? AppTheme.surface : Colors.transparent,
                             borderRadius: BorderRadius.circular(20),
-                            boxShadow: !isExpense ? AppTheme.cardShadow : null,
+                            boxShadow: selectedTab == 1 ? AppTheme.cardShadow : null,
                           ),
                           child: Center(
                             child: Text(
                               'Pemasukan',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
-                                color: !isExpense ? AppTheme.textPrimary : AppTheme.textSecondary,
+                                color: selectedTab == 1 ? AppTheme.textPrimary : AppTheme.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedTab = 2;
+                            isExpense = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: selectedTab == 2 ? AppTheme.surface : Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: selectedTab == 2 ? AppTheme.cardShadow : null,
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Transfer',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: selectedTab == 2 ? AppTheme.primary : AppTheme.textSecondary,
                               ),
                             ),
                           ),
@@ -485,7 +606,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                 FilteringTextInputFormatter.digitsOnly,
                                 ThousandsSeparatorInputFormatter(),
                               ],
-                              autofocus: true,
+                              autofocus: false,
                               style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                               decoration: const InputDecoration(
                                 hintText: '0',
@@ -495,10 +616,75 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               ),
                             ),
                           ),
+                          ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: nominalController,
+                            builder: (context, val, _) {
+                              if (val.text.isEmpty || val.text == '0') return const SizedBox.shrink();
+                              return InkWell(
+                                onTap: () => _addShortcutNominal(0),
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.expenseRed.withOpacity(0.12),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close_rounded,
+                                    size: 18,
+                                    color: AppTheme.expenseRed,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Quick Nominal Shortcuts Row
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    ...[
+                      {'label': '+5rb', 'val': 5000.0},
+                      {'label': '+10rb', 'val': 10000.0},
+                      {'label': '+20rb', 'val': 20000.0},
+                      {'label': '+50rb', 'val': 50000.0},
+                      {'label': '+100rb', 'val': 100000.0},
+                      {'label': '+500rb', 'val': 500000.0},
+                    ].map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: InkWell(
+                          onTap: () => _addShortcutNominal(item['val'] as double),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primary.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppTheme.primary.withOpacity(0.2)),
+                            ),
+                            child: Text(
+                              item['label'] as String,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
@@ -507,9 +693,22 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    isExpense ? 'Sumber Dana (Dompet):' : 'Dompet Tujuan:',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                  Row(
+                    children: [
+                      Text(
+                        selectedTab == 2 ? 'Dari Dompet (Asal):' : (isExpense ? 'Sumber Dana (Dompet):' : 'Dompet Tujuan:'),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        selectedWalletName ?? 'Belum Dipilih',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: selectedWalletName != null ? AppTheme.primary : AppTheme.expenseRed,
+                        ),
+                      ),
+                    ],
                   ),
                   InkWell(
                     onTap: _showAddQuickWalletDialog,
@@ -548,7 +747,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       physics: const BouncingScrollPhysics(),
                       child: Row(
                         children: wallets.map((wallet) {
-                          final isSel = (selectedWalletName ?? wallets.first.name) == wallet.name;
+                          final isSel = selectedWalletName == wallet.name;
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: InkWell(
@@ -601,118 +800,177 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         }).toList(),
                       ),
                     ),
-              const SizedBox(height: 20),
 
-              // Title Input Box
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: AppTheme.cardShadow,
+              // TARGET WALLET SELECTOR FOR TRANSFER MODE
+              if (selectedTab == 2) ...[
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Text('Ke Dompet (Tujuan):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                    const SizedBox(width: 8),
+                    Text(
+                      targetWalletName ?? 'Belum Dipilih',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: targetWalletName != null ? AppTheme.incomeGreen : AppTheme.expenseRed),
+                    ),
+                  ],
                 ),
-                child: TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    icon: Icon(Icons.edit_outlined, color: AppTheme.primary, size: 22),
-                    hintText: 'Judul (Misal: Nasi Padang, Gaji Juli...)',
-                    hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 14),
-                    border: InputBorder.none,
+                const SizedBox(height: 10),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: wallets.map((wallet) {
+                      final isSel = targetWalletName == wallet.name;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: InkWell(
+                          onTap: () => setState(() => targetWalletName = wallet.name),
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isSel ? AppTheme.incomeGreen.withOpacity(0.15) : AppTheme.surface,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: AppTheme.cardShadow,
+                              border: Border.all(
+                                color: isSel ? AppTheme.incomeGreen : AppTheme.outlineVariant.withOpacity(0.5),
+                                width: isSel ? 2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(wallet.iconData, size: 18, color: isSel ? AppTheme.incomeGreen : wallet.brandColor),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(wallet.name, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isSel ? AppTheme.incomeGreen : AppTheme.textPrimary)),
+                                    Text(CurrencyFormatter.format(wallet.balance), style: TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-              ),
+              ],
+
               const SizedBox(height: 20),
 
-              // Kategori Selection (Mandatory & Default Unselected!)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Kategori Transaksi (Wajib)',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              // Title Input Box (Only shown for Expense & Income)
+              if (selectedTab != 2) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: AppTheme.cardShadow,
                   ),
-                  Text(
-                    selectedCategory != null ? selectedCategory!.name : 'Belum Dipilih',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: selectedCategory != null ? AppTheme.primary : AppTheme.expenseRed,
+                  child: TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(
+                      icon: Icon(Icons.edit_outlined, color: AppTheme.primary, size: 22),
+                      hintText: 'Judul (Misal: Nasi Padang, Gaji Juli...)',
+                      hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 14),
+                      border: InputBorder.none,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              ListenableBuilder(
-                listenable: AppState.instance,
-                builder: (context, _) {
-                  final quickCats = AppState.instance.quickCategories;
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ...quickCats.map((cat) {
-                        final isSelected = selectedCategory?.id == cat.id;
-                        return GestureDetector(
-                          onTap: () => setState(() => selectedCategory = cat),
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // Kategori Selection (Only shown for Expense and Income modes!)
+              if (selectedTab != 2) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Kategori Transaksi (Wajib)',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                    ),
+                    Text(
+                      selectedCategory != null ? selectedCategory!.name : 'Belum Dipilih',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: selectedCategory != null ? AppTheme.primary : AppTheme.expenseRed,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                ListenableBuilder(
+                  listenable: AppState.instance,
+                  builder: (context, _) {
+                    final quickCats = isExpense
+                        ? AppState.instance.quickCategories
+                        : AppCategories.incomeCategories.take(4).toList();
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ...quickCats.map((cat) {
+                          final isSelected = selectedCategory?.id == cat.id;
+                          return GestureDetector(
+                            onTap: () => setState(() => selectedCategory = cat),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? AppTheme.primaryContainer : AppTheme.surface,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: AppTheme.cardShadow,
+                                    border: isSelected
+                                        ? Border.all(color: AppTheme.primary, width: 2)
+                                        : Border.all(color: AppTheme.outlineVariant.withOpacity(0.3)),
+                                  ),
+                                  child: Icon(cat.icon, color: isSelected ? AppTheme.textOnPrimary : cat.color, size: 24),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  cat.name,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                    color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                        GestureDetector(
+                          onTap: _openCategorySelect,
                           child: Column(
                             children: [
                               Container(
                                 width: 52,
                                 height: 52,
                                 decoration: BoxDecoration(
-                                  color: isSelected ? AppTheme.primaryContainer : AppTheme.surface,
+                                  color: AppTheme.surface,
                                   borderRadius: BorderRadius.circular(16),
                                   boxShadow: AppTheme.cardShadow,
-                                  border: isSelected
-                                      ? Border.all(color: AppTheme.primary, width: 2)
-                                      : Border.all(color: AppTheme.outlineVariant.withOpacity(0.3)),
                                 ),
-                                child: Icon(
-                                  cat.icon,
-                                  color: isSelected ? AppTheme.textOnPrimary : cat.color,
-                                  size: 26,
-                                ),
+                                child: const Icon(Icons.grid_view, color: AppTheme.primary, size: 26),
                               ),
                               const SizedBox(height: 6),
-                              Text(
-                                cat.name.split(' ')[0],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                  color: isSelected ? AppTheme.textPrimary : AppTheme.textSecondary,
-                                ),
+                              const Text(
+                                'Lainnya',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppTheme.textSecondary),
                               ),
                             ],
                           ),
-                        );
-                      }),
-                      // Lainnya option
-                      GestureDetector(
-                        onTap: _openCategorySelect,
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: AppTheme.surface,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: AppTheme.cardShadow,
-                              ),
-                              child: const Icon(Icons.grid_view, color: AppTheme.primary, size: 26),
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Lainnya',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppTheme.textSecondary),
-                            ),
-                          ],
                         ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
 
               // Tanggal & Jam Selector Box (Interactive Date & Time Picker!)
               InkWell(
@@ -748,6 +1006,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+
+
 
               // Catatan Box
               Container(

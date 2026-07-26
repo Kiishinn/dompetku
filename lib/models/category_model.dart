@@ -16,6 +16,7 @@ class CategoryModel {
   final IconData icon;
   final Color color;
   final CategoryGroup group;
+  final bool isExpense;
 
   const CategoryModel({
     required this.id,
@@ -23,10 +24,54 @@ class CategoryModel {
     required this.icon,
     this.color = AppTheme.primary,
     required this.group,
+    this.isExpense = true,
   });
 }
 
 class AppCategories {
+  static const List<CategoryModel> incomeCategories = [
+    CategoryModel(
+      id: 'cat_salary',
+      name: 'Gaji & Pendapatan',
+      icon: Icons.payments_outlined,
+      color: AppTheme.incomeGreen,
+      group: CategoryGroup.finansial,
+      isExpense: false,
+    ),
+    CategoryModel(
+      id: 'cat_freelance',
+      name: 'Freelance & Sampingan',
+      icon: Icons.laptop_chromebook,
+      color: AppTheme.accentBlue,
+      group: CategoryGroup.finansial,
+      isExpense: false,
+    ),
+    CategoryModel(
+      id: 'cat_bonus',
+      name: 'Bonus & Hadiah',
+      icon: Icons.card_giftcard,
+      color: Colors.orange,
+      group: CategoryGroup.finansial,
+      isExpense: false,
+    ),
+    CategoryModel(
+      id: 'cat_investment_inc',
+      name: 'Investasi & Bunga',
+      icon: Icons.trending_up,
+      color: AppTheme.purpleAccent,
+      group: CategoryGroup.finansial,
+      isExpense: false,
+    ),
+    CategoryModel(
+      id: 'cat_other_income',
+      name: 'Pemasukan Lainnya',
+      icon: Icons.add_chart,
+      color: Colors.teal,
+      group: CategoryGroup.finansial,
+      isExpense: false,
+    ),
+  ];
+
   static const List<CategoryModel> allCategories = [
     // Kebutuhan Utama
     CategoryModel(

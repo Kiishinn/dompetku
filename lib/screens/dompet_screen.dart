@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/app_state.dart';
+import '../models/savings_goal_model.dart';
 import '../theme/app_theme.dart';
 import '../utils/currency_formatter.dart';
 import '../widgets/sheets/notifikasi_sheet.dart';
 import '../widgets/animations/animated_empty_state.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class WalletItem {
   final String name;
@@ -64,6 +67,123 @@ class DompetScreen extends StatefulWidget {
 
 class _DompetScreenState extends State<DompetScreen> {
   bool isBalanceVisible = true;
+
+  void _showAddSavingsGoalDialog() {
+    final titleController = TextEditingController();
+    final targetController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: const Text('Tambah Target Impian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: 'Nama Target Impian',
+                  hintText: 'Misal: Beli Laptop, Dana Darurat',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: targetController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
+                decoration: InputDecoration(
+                  labelText: 'Target Nominal (Rp)',
+                  hintText: '10.000.000',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary))),
+          ElevatedButton(
+            onPressed: () {
+              final title = titleController.text.trim();
+              final targetStr = targetController.text.replaceAll(RegExp(r'[^0-9]'), '');
+              final target = double.tryParse(targetStr) ?? 0.0;
+
+              if (title.isNotEmpty && target > 0) {
+                final newGoal = SavingsGoalModel(
+                  id: 'goal_${DateTime.now().millisecondsSinceEpoch}',
+                  title: title,
+                  targetAmount: target,
+                  currentAmount: 0,
+                  icon: Icons.stars,
+                  color: AppTheme.primary,
+                  targetDate: DateTime.now().add(const Duration(days: 90)),
+                );
+                AppState.instance.addSavingsGoal(newGoal);
+                Navigator.pop(ctx);
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            child: const Text('Simpan Target', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDepositGoalDialog(SavingsGoalModel goal) {
+    final amountController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text('Setor Tabungan [${goal.title}]', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Target: ${CurrencyFormatter.format(goal.targetAmount)} (${goal.percentageInt}% terkumpul)', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+            const SizedBox(height: 14),
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
+              decoration: InputDecoration(
+                labelText: 'Nominal Setoran (Rp)',
+                hintText: '500.000',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary))),
+          ElevatedButton(
+            onPressed: () {
+              final cleanStr = amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
+              final amount = double.tryParse(cleanStr) ?? 0.0;
+              if (amount > 0) {
+                AppState.instance.depositToSavingsGoal(goal.id, amount);
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("🎉 Berhasil menyetor ${CurrencyFormatter.format(amount)} ke target ${goal.title}!"),
+                    backgroundColor: AppTheme.incomeGreen,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.incomeGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            child: const Text('Setor Tabungan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showAdjustBalanceDialog(WalletItem wallet) {
     final balanceController = TextEditingController();
@@ -290,58 +410,45 @@ class _DompetScreenState extends State<DompetScreen> {
                           ),
                         ],
                       ),
-                      Row(
+                      Stack(
+                        alignment: Alignment.center,
                         children: [
-                          IconButton(
-                            icon: Icon(
-                              isBalanceVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                              color: AppTheme.primary,
-                              size: 22,
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: const BoxDecoration(
+                              color: AppTheme.surfaceContainer,
+                              shape: BoxShape.circle,
                             ),
-                            onPressed: () => setState(() => isBalanceVisible = !isBalanceVisible),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.notifications_outlined,
+                                color: AppTheme.primary,
+                                size: 22,
+                              ),
+                              onPressed: () => NotifikasiSheet.show(context),
+                            ),
                           ),
-                          const SizedBox(width: 4),
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
+                          if (appState.unreadNotificationCount > 0)
+                            Positioned(
+                              right: 2,
+                              top: 2,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
                                 decoration: const BoxDecoration(
-                                  color: AppTheme.surfaceContainer,
+                                  color: AppTheme.expenseRed,
                                   shape: BoxShape.circle,
                                 ),
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.notifications_outlined,
-                                    color: AppTheme.primary,
-                                    size: 22,
+                                child: Text(
+                                  '${appState.unreadNotificationCount}',
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                  onPressed: () => NotifikasiSheet.show(context),
                                 ),
                               ),
-                              if (appState.unreadNotificationCount > 0)
-                                Positioned(
-                                  right: 2,
-                                  top: 2,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: AppTheme.expenseRed,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      '${appState.unreadNotificationCount}',
-                                      style: const TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
+                            ),
                         ],
                       ),
                     ],
@@ -368,14 +475,28 @@ class _DompetScreenState extends State<DompetScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'TOTAL ASET DI SEMUA DOMPET',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white.withOpacity(0.8),
-                            letterSpacing: 1,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'TOTAL ASET DI SEMUA DOMPET',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white.withOpacity(0.8),
+                                letterSpacing: 1,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () => setState(() => isBalanceVisible = !isBalanceVisible),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Icon(
+                                isBalanceVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                color: Colors.white.withOpacity(0.8),
+                                size: 18,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         Wrap(
@@ -507,9 +628,18 @@ class _DompetScreenState extends State<DompetScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final wallet = wallets[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-                            child: _buildWalletCard(wallet),
+                          return AnimationConfiguration.staggeredList(
+                            position: index,
+                            duration: const Duration(milliseconds: 375),
+                            child: SlideAnimation(
+                              verticalOffset: 20.0,
+                              child: FadeInAnimation(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                                  child: _buildWalletCard(wallet),
+                                ),
+                              ),
+                            ),
                           );
                         },
                         childCount: wallets.length,

@@ -13,6 +13,9 @@ class TransactionModel {
   final DateTime date;
   final String timeText;
   final String note;
+  final bool isRecurring;
+  final String repeatInterval;
+  final bool isTransfer;
 
   const TransactionModel({
     required this.id,
@@ -26,6 +29,9 @@ class TransactionModel {
     required this.date,
     this.timeText = '12:00 WIB',
     this.note = '',
+    this.isRecurring = false,
+    this.repeatInterval = 'Bulanan',
+    this.isTransfer = false,
   });
 
   String get displayWallet => (walletName != null && walletName!.isNotEmpty) ? walletName! : 'Uang Tunai';
@@ -47,7 +53,9 @@ class TransactionModel {
     }
   }
 
-  Color get amountColor => isIncome ? AppTheme.incomeGreen : AppTheme.expenseRed;
+  bool get isRealTransfer => (isTransfer == true) || categoryName.toLowerCase().contains('transfer') || title.toLowerCase().startsWith('transfer');
+
+  Color get amountColor => isRealTransfer ? AppTheme.accentBlue : ((isIncome == true) ? AppTheme.incomeGreen : AppTheme.expenseRed);
 
   Map<String, dynamic> toJson() {
     return {
@@ -62,6 +70,9 @@ class TransactionModel {
       'date': date.toIso8601String(),
       'timeText': timeText,
       'note': note,
+      'isRecurring': isRecurring,
+      'repeatInterval': repeatInterval,
+      'isTransfer': isTransfer,
     };
   }
 
@@ -78,6 +89,9 @@ class TransactionModel {
       date: DateTime.parse(json['date']),
       timeText: json['timeText'] ?? '12:00 WIB',
       note: json['note'] ?? '',
+      isRecurring: json['isRecurring'] ?? false,
+      repeatInterval: json['repeatInterval'] ?? 'Bulanan',
+      isTransfer: json['isTransfer'] ?? false,
     );
   }
 }

@@ -28,50 +28,18 @@ class SkorKesehatanSheet extends StatelessWidget {
         final totalExpense = appState.totalExpense;
         final totalBalance = appState.totalBalance;
 
-        // Calculate Dynamic Score if customScore not explicitly passed
-        int computedScore = 85;
-        String scoreTitle = "Sangat Baik";
-        Color scoreColor = AppTheme.incomeGreen;
-        String scoreMessage = "Arus kas & rasio tabunganmu sangat sehat!";
+        final finalScore = customScore ?? appState.financialHealthScore;
+        final scoreTitle = appState.financialHealthTitle;
+        final scoreColor = appState.financialHealthColor;
 
-        if (totalIncome > 0) {
-          final savings = totalIncome - totalExpense;
-          final savingsRatio = savings / totalIncome;
-
-          int points = 30; // base
-          if (savingsRatio >= 0.3) {
-            points += 40;
-          } else if (savingsRatio >= 0.1) {
-            points += 25;
-          } else if (savingsRatio > 0) {
-            points += 10;
-          } else {
-            points -= 15;
-          }
-
-          if (totalBalance > 0) points += 15;
-          if (appState.totalBudgetedLimit > 0 && totalExpense <= appState.totalBudgetedLimit) {
-            points += 14;
-          }
-
-          computedScore = points.clamp(35, 98);
-        } else if (totalExpense > 0) {
-          computedScore = 65;
-        }
-
-        final finalScore = customScore ?? computedScore;
-
-        if (finalScore >= 80) {
-          scoreTitle = "Sangat Sehat";
-          scoreColor = AppTheme.incomeGreen;
+        String scoreMessage = "Arus kas & manajemen anggaranmu sangat baik!";
+        if (finalScore == 0) {
+          scoreMessage = "Belum ada transaksi bulan ini. Catat transaksi pengeluaran dan pemasukan pertama Anda untuk menganalisis skor otomatis!";
+        } else if (finalScore >= 80) {
           scoreMessage = "Arus kas & manajemen anggaranmu sangat baik!";
         } else if (finalScore >= 60) {
-          scoreTitle = "Cukup Baik";
-          scoreColor = AppTheme.warningAmber;
           scoreMessage = "Keuangan stabil, tingkatkan sisa jatah tabunganmu.";
         } else {
-          scoreTitle = "Perlu Perhatian";
-          scoreColor = AppTheme.expenseRed;
           scoreMessage = "Pengeluaran cukup tinggi, perhatikan limit anggaran.";
         }
 
@@ -111,6 +79,13 @@ class SkorKesehatanSheet extends StatelessWidget {
             iconTint: AppTheme.expenseRed,
             title: "$overbudgetCount Kategori Overbudget",
             subtitle: "Ada $overbudgetCount kategori yang telah melampaui limit anggaran bulan ini.",
+          ));
+        } else if (totalIncome == 0 && totalExpense == 0) {
+          insightWidgets.add(_buildInsightCard(
+            icon: Icons.lightbulb_outline,
+            iconTint: AppTheme.primary,
+            title: "Siap Menganalisis Keuangan Anda",
+            subtitle: "Tambahkan transaksi pertama Anda melalui tombol (+) untuk mulai memantau kesehatan finansial.",
           ));
         } else {
           insightWidgets.add(_buildInsightCard(

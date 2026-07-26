@@ -77,13 +77,40 @@ class TransactionItemWidget extends StatelessWidget {
             const SizedBox(height: 20),
             Divider(color: AppTheme.outlineVariant.withOpacity(0.5)),
             const SizedBox(height: 14),
-            _buildDetailRow("Nominal", CurrencyFormatter.format(transaction.amount, isIncome: transaction.isIncome, withSign: true), isValueBold: true, valueColor: transaction.amountColor),
-            const SizedBox(height: 10),
-            _buildDetailRow("Tipe Transaksi", transaction.isIncome ? "Pemasukan (+)" : "Pengeluaran (-)"),
-            const SizedBox(height: 10),
-            _buildDetailRow("Waktu & Tanggal", "${transaction.formattedDateLabel} (${transaction.date.day}/${transaction.date.month}/${transaction.date.year})"),
-            const SizedBox(height: 10),
-            _buildDetailRow("Dompet / Akun", transaction.displayWallet),
+            if (transaction.isRealTransfer) ...[
+              () {
+                String fromW = transaction.displayWallet;
+                String toW = '-';
+                if (transaction.title.contains(' ➔ ')) {
+                  final parts = transaction.title.replaceFirst('Transfer ', '').split(' ➔ ');
+                  if (parts.length == 2) {
+                    fromW = parts[0].trim();
+                    toW = parts[1].trim();
+                  }
+                }
+                return Column(
+                  children: [
+                    _buildDetailRow("Tipe Transaksi", "Transfer Internal Dana (Netral)"),
+                    const SizedBox(height: 10),
+                    _buildDetailRow("Dari Dompet (Asal)", fromW, isValueBold: true),
+                    const SizedBox(height: 10),
+                    _buildDetailRow("Ke Dompet (Tujuan)", toW, isValueBold: true, valueColor: AppTheme.incomeGreen),
+                    const SizedBox(height: 10),
+                    _buildDetailRow("Nominal Transfer", CurrencyFormatter.format(transaction.amount), isValueBold: true, valueColor: AppTheme.accentBlue),
+                    const SizedBox(height: 10),
+                    _buildDetailRow("Waktu & Tanggal", "${transaction.formattedDateLabel} (${transaction.date.day}/${transaction.date.month}/${transaction.date.year})"),
+                  ],
+                );
+              }(),
+            ] else ...[
+              _buildDetailRow("Nominal", CurrencyFormatter.format(transaction.amount, isIncome: transaction.isIncome == true, withSign: true), isValueBold: true, valueColor: transaction.amountColor),
+              const SizedBox(height: 10),
+              _buildDetailRow("Tipe Transaksi", transaction.isIncome == true ? "Pemasukan (+)" : "Pengeluaran (-)"),
+              const SizedBox(height: 10),
+              _buildDetailRow("Waktu & Tanggal", "${transaction.formattedDateLabel} (${transaction.date.day}/${transaction.date.month}/${transaction.date.year})"),
+              const SizedBox(height: 10),
+              _buildDetailRow("Dompet / Akun", transaction.displayWallet),
+            ],
             if (transaction.note.trim().isNotEmpty) ...[
               const SizedBox(height: 14),
               Divider(color: AppTheme.outlineVariant.withOpacity(0.5)),
@@ -121,18 +148,104 @@ class TransactionItemWidget extends StatelessWidget {
                               child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
                             ),
                             ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(confirmCtx);
-                                Navigator.pop(ctx);
-                                AppState.instance.deleteTransaction(transaction.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Transaksi '${transaction.title}' telah dihapus."),
-                                    backgroundColor: AppTheme.expenseRed,
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
+                                onPressed: () {
+                                  Navigator.pop(confirmCtx);
+                                  Navigator.pop(ctx);
+
+                                  final deletedTx = transaction;
+                                  final originalIdx = AppState.instance.transactions.indexWhere((t) => t.id == transaction.id);
+
+                                  AppState.instance.deleteTransaction(transaction.id);
+
+                                  final messenger = ScaffoldMessenger.of(context);
+                                  messenger.clearSnackBars();
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      duration: const Duration(milliseconds: 3200),
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                      behavior: SnackBarBehavior.floating,
+                                      padding: EdgeInsets.zero,
+                                      dismissDirection: DismissDirection.horizontal,
+                                      content: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF1E293B),
+                                          borderRadius: BorderRadius.circular(16),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.25),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      "🗑️ Transaksi '${transaction.title}' dihapus",
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 13,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      messenger.hideCurrentSnackBar();
+                                                      AppState.instance.restoreTransaction(
+                                                        deletedTx,
+                                                        originalIdx >= 0 ? originalIdx : 0,
+                                                      );
+                                                    },
+                                                    style: TextButton.styleFrom(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                                      minimumSize: Size.zero,
+                                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                    ),
+                                                    child: const Text(
+                                                      'BATALKAN',
+                                                      style: TextStyle(
+                                                        color: Color(0xFFFFC107),
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // Smooth 3-Second Golden Timer Bar Animation
+                                            ClipRRect(
+                                              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                                              child: TweenAnimationBuilder<double>(
+                                                duration: const Duration(milliseconds: 3000),
+                                                tween: Tween(begin: 1.0, end: 0.0),
+                                                builder: (context, value, child) {
+                                                  return LinearProgressIndicator(
+                                                    value: value,
+                                                    minHeight: 3,
+                                                    backgroundColor: Colors.white.withOpacity(0.1),
+                                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFC107)),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.expenseRed,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -345,11 +458,13 @@ class TransactionItemWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  CurrencyFormatter.format(
-                    transaction.amount,
-                    isIncome: transaction.isIncome,
-                    withSign: true,
-                  ),
+                  (transaction.isTransfer == true)
+                      ? CurrencyFormatter.format(transaction.amount)
+                      : CurrencyFormatter.format(
+                          transaction.amount,
+                          isIncome: transaction.isIncome == true,
+                          withSign: true,
+                        ),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

@@ -16,6 +16,12 @@ class DompetkuApp extends StatelessWidget {
       title: 'Dompetku',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.themeData,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
       home: const SplashScreen(),
     );
   }
