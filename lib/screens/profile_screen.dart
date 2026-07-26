@@ -1000,12 +1000,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     children: const [
                                       Icon(Icons.workspace_premium_rounded, color: AppTheme.incomeGreen, size: 14),
                                       SizedBox(width: 4),
-                                      Text(
-                                        'Akun Premium • Dompetku Pro',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTheme.incomeGreen,
+                                      Flexible(
+                                        child: Text(
+                                          'Akun Premium • Dompetku Pro',
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppTheme.incomeGreen,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -1119,15 +1122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTap: () {
                           PilihKategoriSheet.show(
                             context,
-                            onSelectCategory: (cat) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Kategori '${cat.name}' terpilih!"),
-                                  backgroundColor: AppTheme.primary,
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
-                            },
+                            isManageOnly: true,
                           );
                         },
                       ),

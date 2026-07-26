@@ -4,20 +4,23 @@ import '../../models/app_state.dart';
 import '../../theme/app_theme.dart';
 
 class PilihKategoriSheet extends StatefulWidget {
-  final Function(CategoryModel) onSelectCategory;
+  final Function(CategoryModel)? onSelectCategory;
   final VoidCallback? onAddNewCategoryClick;
   final bool isExpense;
+  final bool isManageOnly;
 
   const PilihKategoriSheet({
     super.key,
-    required this.onSelectCategory,
+    this.onSelectCategory,
     this.onAddNewCategoryClick,
     this.isExpense = true,
+    this.isManageOnly = false,
   });
 
   static void show(BuildContext context, {
-    required Function(CategoryModel) onSelectCategory,
+    Function(CategoryModel)? onSelectCategory,
     bool isExpense = true,
+    bool isManageOnly = false,
     VoidCallback? onAddNewCategoryClick,
   }) {
     showModalBottomSheet(
@@ -27,6 +30,7 @@ class PilihKategoriSheet extends StatefulWidget {
       builder: (context) => PilihKategoriSheet(
         onSelectCategory: onSelectCategory,
         isExpense: isExpense,
+        isManageOnly: isManageOnly,
         onAddNewCategoryClick: onAddNewCategoryClick ?? () => _showAddCustomCategoryDialog(context, onSelectCategory),
       ),
     );
@@ -34,7 +38,7 @@ class PilihKategoriSheet extends StatefulWidget {
 
   static void _showAddCustomCategoryDialog(
     BuildContext context,
-    Function(CategoryModel) onSelect, {
+    Function(CategoryModel)? onSelect, {
     bool defaultIsExpense = true,
   }) {
     final TextEditingController nameController = TextEditingController();
@@ -227,7 +231,7 @@ class PilihKategoriSheet extends StatefulWidget {
                   );
                   AppState.instance.addCustomCategory(newCat);
                   Navigator.pop(ctx);
-                  onSelect(newCat);
+                  if (onSelect != null) onSelect(newCat);
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
@@ -239,103 +243,260 @@ class PilihKategoriSheet extends StatefulWidget {
     );
   }
 
-  static void _showReorderModal(BuildContext context, {bool isExpense = true}) {
+  static void showManageActionSheet(BuildContext context, CategoryModel cat) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
         decoration: const BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: AppTheme.outlineVariant,
-                borderRadius: BorderRadius.circular(2),
-              ),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: AppTheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isExpense ? "Urutkan Kategori Pengeluaran" : "Urutkan Kategori Pemasukan",
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(color: cat.color.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                  child: Icon(cat.icon, color: cat.color, size: 24),
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text("Selesai", style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(cat.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                      Text(cat.isExpense ? "Kategori Pengeluaran" : "Kategori Pemasukan", style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+                    ],
+                  ),
+                ),
+                IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close, color: AppTheme.textSecondary)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: AppTheme.accentBlue.withOpacity(0.15), shape: BoxShape.circle),
+                child: const Icon(Icons.edit_outlined, color: AppTheme.accentBlue),
+              ),
+              title: const Text("Edit Kategori", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.textPrimary)),
+              subtitle: const Text("Ubah nama, warna, atau ikon kategori ini", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showEditCategoryDialog(context, cat);
+              },
+            ),
+            const Divider(color: AppTheme.surfaceContainer, height: 20),
+            ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: AppTheme.expenseRed.withOpacity(0.15), shape: BoxShape.circle),
+                child: const Icon(Icons.delete_outline, color: AppTheme.expenseRed),
+              ),
+              title: const Text("Hapus Kategori", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.expenseRed)),
+              subtitle: const Text("Buang dari daftar inventory Anda", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _executeDeleteWithUndo(context, cat);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static void _executeDeleteWithUndo(BuildContext context, CategoryModel cat) {
+    final index = AppState.instance.categories.indexWhere((c) => c.id == cat.id);
+    final deleted = AppState.instance.deleteCategory(cat.id);
+    if (deleted != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Kategori '${cat.name}' telah dibuang.", style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600)),
+          backgroundColor: AppTheme.surfaceVariant,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          action: SnackBarAction(
+            label: "BATALKAN (UNDO)",
+            textColor: AppTheme.primary,
+            onPressed: () {
+              AppState.instance.restoreCategory(deleted, index: index >= 0 ? index : null);
+            },
+          ),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
+  static void _showEditCategoryDialog(BuildContext context, CategoryModel oldCat) {
+    final TextEditingController nameController = TextEditingController(text: oldCat.name);
+    IconData selectedIcon = oldCat.icon;
+    Color selectedColor = oldCat.color;
+    bool isExpenseType = oldCat.isExpense;
+
+    final List<IconData> availableIcons = [
+      Icons.restaurant, Icons.directions_car, Icons.shopping_bag_outlined, Icons.home_outlined,
+      Icons.work_outline, Icons.laptop_chromebook, Icons.card_giftcard, Icons.trending_up,
+      Icons.sports_esports_outlined, Icons.flight_takeoff, Icons.medical_services_outlined, Icons.school_outlined,
+      Icons.bolt, Icons.local_gas_station, Icons.pets, Icons.star_outline,
+    ];
+
+    final List<Color> availableColors = [
+      AppTheme.primary, AppTheme.incomeGreen, AppTheme.expenseRed, AppTheme.warningAmber,
+      AppTheme.purpleAccent, AppTheme.pinkAccent, AppTheme.accentBlue, Colors.teal,
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: AppTheme.surface,
+          title: const Text("Edit Kategori", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textPrimary)),
+          content: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Tipe Kategori:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(color: AppTheme.surfaceContainerLow, borderRadius: BorderRadius.circular(16)),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setDialogState(() => isExpenseType = true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isExpenseType ? AppTheme.surface : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: isExpenseType ? AppTheme.cardShadow : null,
+                            ),
+                            child: Center(
+                              child: Text('Pengeluaran', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setDialogState(() => isExpenseType = false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: !isExpenseType ? AppTheme.surface : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: !isExpenseType ? AppTheme.cardShadow : null,
+                            ),
+                            child: Center(
+                              child: Text('Pemasukan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: !isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text("Nama Kategori:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    hintText: "Contoh: Kuliner Harian",
+                    filled: true,
+                    fillColor: AppTheme.surfaceContainerLow,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text("Pilih Ikon:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: availableIcons.map((ic) {
+                    final isSel = selectedIcon == ic || selectedIcon.codePoint == ic.codePoint;
+                    return InkWell(
+                      onTap: () => setDialogState(() => selectedIcon = ic),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSel ? selectedColor.withOpacity(0.2) : AppTheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(10),
+                          border: isSel ? Border.all(color: selectedColor, width: 2) : null,
+                        ),
+                        child: Icon(ic, color: isSel ? selectedColor : AppTheme.textSecondary, size: 22),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                const Text("Pilih Warna:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: availableColors.map((col) {
+                    final isSel = selectedColor.value == col.value;
+                    return GestureDetector(
+                      onTap: () => setDialogState(() => selectedColor = col),
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: col,
+                          shape: BoxShape.circle,
+                          border: isSel ? Border.all(color: Colors.white, width: 3) : null,
+                          boxShadow: isSel ? [BoxShadow(color: col.withOpacity(0.6), blurRadius: 6)] : null,
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
               ],
             ),
-            const SizedBox(height: 6),
-            const Text(
-              "Geser (drag & drop) item kategori di bawah untuk mengatur urutannya. 4 posisi teratas akan muncul di menu utama.",
-              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, height: 1.3),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: AppState.instance,
-                builder: (context, _) {
-                  final categories = isExpense
-                      ? AppState.instance.categories.where((c) => c.isExpense != false).toList()
-                      : AppCategories.incomeCategories;
-                  return ReorderableListView.builder(
-                    itemCount: categories.length,
-                    onReorder: (oldIndex, newIndex) {
-                      if (isExpense) {
-                        AppState.instance.reorderCategories(oldIndex, newIndex);
-                      }
-                    },
-                    itemBuilder: (context, index) {
-                      final cat = categories[index];
-                      return Container(
-                        key: ValueKey(cat.id),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: index < 4 ? AppTheme.primaryContainer.withOpacity(0.4) : AppTheme.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(12),
-                          border: index < 4 ? Border.all(color: AppTheme.primary.withOpacity(0.5)) : null,
-                        ),
-                        child: ListTile(
-                          leading: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: cat.color.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(cat.icon, color: cat.color, size: 20),
-                          ),
-                          title: Text(
-                            cat.name,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: index < 4 ? FontWeight.bold : FontWeight.w600,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                          subtitle: index < 4
-                              ? const Text("⭐ Tampil di Akses Cepat", style: TextStyle(fontSize: 11, color: AppTheme.primary, fontWeight: FontWeight.bold))
-                              : null,
-                          trailing: const Icon(Icons.drag_handle, color: AppTheme.textSecondary),
-                        ),
-                      );
-                    },
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.trim().isNotEmpty) {
+                  final updatedCat = CategoryModel(
+                    id: oldCat.id,
+                    name: nameController.text.trim(),
+                    icon: selectedIcon,
+                    color: selectedColor,
+                    group: oldCat.group,
+                    isExpense: isExpenseType,
                   );
-                },
-              ),
+                  AppState.instance.updateCategory(oldCat.id, updatedCat);
+                  Navigator.pop(ctx);
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+              child: const Text("Simpan Perubahan", style: TextStyle(color: AppTheme.textOnPrimary)),
             ),
           ],
         ),
@@ -393,32 +554,9 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                   color: AppTheme.textPrimary,
                 ),
               ),
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () => PilihKategoriSheet._showReorderModal(context, isExpense: currentIsExpense),
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryContainer.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.swap_vert, size: 16, color: AppTheme.primary),
-                          SizedBox(width: 4),
-                          Text("Atur Urutan", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppTheme.textSecondary),
-                  ),
-                ],
+              IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close, color: AppTheme.textSecondary),
               ),
             ],
           ),
@@ -511,25 +649,52 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                 builder: (context, _) {
                   final categories = currentIsExpense
                       ? AppState.instance.categories.where((c) => c.isExpense != false).toList()
-                      : AppCategories.incomeCategories;
+                      : AppState.instance.categories.where((c) => !c.isExpense).toList();
                   final filteredCats = categories.where((cat) {
                     return searchQuery.isEmpty || cat.name.toLowerCase().contains(searchQuery);
                   }).toList();
 
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 0.95,
-                    ),
-                    itemCount: filteredCats.length,
-                    itemBuilder: (context, index) {
-                      final cat = filteredCats[index];
-                      return _buildGridTile(cat);
-                    },
+                  return Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppTheme.outlineVariant),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.inventory_2_outlined, size: 16, color: AppTheme.primary),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                widget.isManageOnly
+                                    ? "Mode Kelola: Ketuk item atau ikon titik tiga untuk edit & hapus. Tahan & geser untuk tukar urutan Hotbar (4 Slot Atas)."
+                                    : "Ketuk untuk pilih transaksi. Geser untuk scroll. Tahan untuk angkat & atur Hotbar (4 Slot Atas). Ketuk 2x / ikon titik tiga untuk edit & hapus.",
+                                style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, height: 1.3),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 0.78,
+                        ),
+                        itemCount: filteredCats.length,
+                        itemBuilder: (context, index) {
+                          final cat = filteredCats[index];
+                          return _buildGridTile(cat, index, currentIsExpense);
+                        },
+                      ),
+                    ],
                   );
                 },
               ),
@@ -564,45 +729,157 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
     );
   }
 
-  Widget _buildGridTile(CategoryModel cat) {
-    return InkWell(
-      onTap: () {
-        widget.onSelectCategory(cat);
-        Navigator.pop(context);
-      },
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: AppTheme.background,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: cat.color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(cat.icon, color: cat.color, size: 22),
+  Widget _buildGridTile(CategoryModel cat, int index, bool isExpense) {
+    final isHotbar = index < 4;
+
+    final tileContent = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: isHotbar
+            ? Border.all(color: AppTheme.warningAmber, width: 1.8)
+            : Border.all(color: AppTheme.outlineVariant.withOpacity(0.5)),
+        boxShadow: isHotbar
+            ? [BoxShadow(color: AppTheme.warningAmber.withOpacity(0.25), blurRadius: 10, spreadRadius: 1)]
+            : AppTheme.cardShadow,
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: cat.color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(cat.icon, color: cat.color, size: 20),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  cat.name,
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isHotbar ? FontWeight.w700 : FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              cat.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+          ),
+          if (isHotbar)
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                decoration: BoxDecoration(
+                  color: AppTheme.warningAmber,
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: [BoxShadow(color: AppTheme.warningAmber.withOpacity(0.4), blurRadius: 4)],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${index + 1}',
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          Positioned(
+            top: -10,
+            right: -10,
+            child: IconButton(
+              icon: const Icon(Icons.more_vert, size: 16, color: AppTheme.textSecondary),
+              splashRadius: 16,
+              onPressed: () => PilihKategoriSheet.showManageActionSheet(context, cat),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final feedbackWidget = Material(
+      color: Colors.transparent,
+      child: Transform.scale(
+        scale: 1.1,
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: cat.color.withOpacity(0.4), blurRadius: 12, spreadRadius: 2)],
+            border: Border.all(color: cat.color, width: 2),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(cat.icon, color: cat.color, size: 28),
+              const SizedBox(height: 6),
+              Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+            ],
+          ),
         ),
       ),
+    );
+
+    return DragTarget<int>(
+      onWillAccept: (fromIndex) => fromIndex != null && fromIndex != index,
+      onAccept: (fromIndex) {
+        AppState.instance.swapCategorySlots(fromIndex, index, isExpense: isExpense);
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isHighlighted = candidateData.isNotEmpty;
+        return LongPressDraggable<int>(
+          data: index,
+          feedback: feedbackWidget,
+          childWhenDragging: Opacity(
+            opacity: 0.3,
+            child: tileContent,
+          ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: isHighlighted
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.warningAmber, width: 2.5),
+                  )
+                : const BoxDecoration(),
+            child: InkWell(
+              onTap: () {
+                if (widget.isManageOnly) {
+                  PilihKategoriSheet.showManageActionSheet(context, cat);
+                } else {
+                  if (widget.onSelectCategory != null) {
+                    widget.onSelectCategory!(cat);
+                  }
+                  Navigator.pop(context, cat);
+                }
+              },
+              onDoubleTap: widget.isManageOnly ? null : () => PilihKategoriSheet.showManageActionSheet(context, cat),
+              borderRadius: BorderRadius.circular(16),
+              child: tileContent,
+            ),
+          ),
+        );
+      },
     );
   }
 }

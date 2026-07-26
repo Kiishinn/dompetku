@@ -907,62 +907,92 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   builder: (context, _) {
                     final quickCats = isExpense
                         ? AppState.instance.quickCategories
-                        : AppCategories.incomeCategories.take(4).toList();
+                        : AppState.instance.categories.where((c) => !c.isExpense).take(4).toList();
+                    final isOutsideSelected = selectedCategory != null &&
+                        !quickCats.any((c) => c.id == selectedCategory!.id);
+
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ...quickCats.map((cat) {
                           final isSelected = selectedCategory?.id == cat.id;
-                          return GestureDetector(
-                            onTap: () => setState(() => selectedCategory = cat),
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () => setState(() => selectedCategory = cat),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 52,
+                                    height: 52,
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? AppTheme.primaryContainer : AppTheme.surface,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: AppTheme.cardShadow,
+                                      border: isSelected
+                                          ? Border.all(color: AppTheme.primary, width: 2)
+                                          : Border.all(color: AppTheme.outlineVariant.withOpacity(0.3)),
+                                    ),
+                                    child: Icon(cat.icon, color: isSelected ? AppTheme.textOnPrimary : cat.color, size: 24),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                                    child: Text(
+                                      cat.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                        color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: _openCategorySelect,
                             child: Column(
                               children: [
                                 Container(
                                   width: 52,
                                   height: 52,
                                   decoration: BoxDecoration(
-                                    color: isSelected ? AppTheme.primaryContainer : AppTheme.surface,
+                                    color: isOutsideSelected ? AppTheme.primaryContainer : AppTheme.surface,
                                     borderRadius: BorderRadius.circular(16),
                                     boxShadow: AppTheme.cardShadow,
-                                    border: isSelected
+                                    border: isOutsideSelected
                                         ? Border.all(color: AppTheme.primary, width: 2)
                                         : Border.all(color: AppTheme.outlineVariant.withOpacity(0.3)),
                                   ),
-                                  child: Icon(cat.icon, color: isSelected ? AppTheme.textOnPrimary : cat.color, size: 24),
+                                  child: Icon(
+                                    isOutsideSelected ? selectedCategory!.icon : Icons.grid_view,
+                                    color: isOutsideSelected ? AppTheme.textOnPrimary : AppTheme.primary,
+                                    size: 26,
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
-                                Text(
-                                  cat.name,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                    color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  child: Text(
+                                    isOutsideSelected ? selectedCategory!.name : 'Lainnya',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: isOutsideSelected ? FontWeight.bold : FontWeight.w500,
+                                      color: isOutsideSelected ? AppTheme.primary : AppTheme.textSecondary,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          );
-                        }),
-                        GestureDetector(
-                          onTap: _openCategorySelect,
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 52,
-                                height: 52,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.surface,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: AppTheme.cardShadow,
-                                ),
-                                child: const Icon(Icons.grid_view, color: AppTheme.primary, size: 26),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'Lainnya',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppTheme.textSecondary),
-                              ),
-                            ],
                           ),
                         ),
                       ],

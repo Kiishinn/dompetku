@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/currency_formatter.dart';
 import '../../models/app_state.dart';
-import '../../widgets/sheets/pilih_kategori_sheet.dart';
 
 class AturAnggaranSheet extends StatefulWidget {
   final String? initialCategoryName;
@@ -45,95 +44,188 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
   bool isNotifEnabled = true;
   int warningPercent = 80;
 
-  void _showEditCategoryLimitDialog(String categoryName, double currentLimit) {
+  Widget _buildQuickChip(TextEditingController ctrl, String label, double value) {
+    return InkWell(
+      onTap: () {
+        ctrl.text = CurrencyFormatter.formatRawDigits(value.toInt().toString());
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTheme.primary.withOpacity(0.25)),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showEditCategoryLimitDialog(String categoryName, double currentLimit, [IconData? icon, Color? color]) {
     final controller = TextEditingController(
       text: currentLimit > 0 ? CurrencyFormatter.formatRawDigits(currentLimit.toInt().toString()) : '',
     );
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(
-          children: [
-            const Icon(Icons.tune, color: AppTheme.primary, size: 22),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Atur Limit [$categoryName]',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        backgroundColor: AppTheme.surface,
+        elevation: 8,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(24),
             ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Masukkan batas maksimal pengeluaran bulanan untuk kategori ini:',
-              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              autofocus: true,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                ThousandsSeparatorInputFormatter(),
-              ],
-              decoration: InputDecoration(
-                labelText: 'Nominal Limit Bulanan (Rp)',
-                hintText: '0 (Isi 0 untuk menghapus limit)',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final cleanText = controller.text.replaceAll(RegExp(r'[^0-9]'), '');
-              final amount = double.tryParse(cleanText) ?? 0.0;
-              AppState.instance.setCategoryBudget(categoryName, amount);
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    amount > 0
-                        ? "Limit [$categoryName] disetor ke ${CurrencyFormatter.format(amount)}!"
-                        : "Limit [$categoryName] dihapus.",
-                  ),
-                  backgroundColor: amount > 0 ? AppTheme.incomeGreen : AppTheme.primary,
-                  behavior: SnackBarBehavior.floating,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Megah
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: (color ?? AppTheme.primary).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(icon ?? Icons.tune, color: color ?? AppTheme.primary, size: 24),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            categoryName,
+                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppTheme.textPrimary),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            'Kelola Batas Anggaran Bulanan',
+                            style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, color: AppTheme.textSecondary, size: 22),
+                      splashRadius: 20,
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                const SizedBox(height: 20),
+
+                // Field Nominal Eksklusif
+                TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  autofocus: false,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: 'Nominal Limit Bulanan',
+                    labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+                    prefixText: 'Rp ',
+                    prefixStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primary),
+                    hintText: '0 (Bebas Limit)',
+                    hintStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: AppTheme.textLight),
+                    filled: true,
+                    fillColor: AppTheme.surfaceContainerLow,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: AppTheme.outlineVariant),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: AppTheme.primary, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Chip Pilihan Nominal Cepat (Bebas Emoji)
+                const Text(
+                  'Pilihan Nominal Cepat:',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildQuickChip(controller, '500 Rb', 500000),
+                    _buildQuickChip(controller, '1 Jt', 1000000),
+                    _buildQuickChip(controller, '2 Jt', 2000000),
+                    _buildQuickChip(controller, '3 Jt', 3000000),
+                    _buildQuickChip(controller, '5 Jt', 5000000),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Tombol Aksi Simpan Megah
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final cleanText = controller.text.replaceAll(RegExp(r'[^0-9]'), '');
+                      final amount = double.tryParse(cleanText) ?? 0.0;
+                      AppState.instance.setCategoryBudget(categoryName, amount);
+                      if (widget.onSaveBudget != null) {
+                        widget.onSaveBudget!(categoryName, amount, warningPercent, isNotifEnabled);
+                      }
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            amount > 0
+                                ? "Limit [$categoryName] disetor ke ${CurrencyFormatter.format(amount)}!"
+                                : "Limit [$categoryName] dihapus.",
+                          ),
+                          backgroundColor: amount > 0 ? AppTheme.incomeGreen : AppTheme.primary,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      elevation: 2,
+                      shadowColor: AppTheme.primary.withOpacity(0.3),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: const Text('Simpan & Terapkan Limit', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                  ),
+                ),
+              ],
             ),
-            child: const Text('Simpan Limit', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
-        ],
+        ),
       ),
     );
   }
-
-  void _addNewCategoryBudget() {
-    PilihKategoriSheet.show(
-      context,
-      onSelectCategory: (cat) {
-        _showEditCategoryLimitDialog(cat.name, AppState.instance.categoryBudgets[cat.name] ?? 0.0);
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -266,24 +358,10 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
               const SizedBox(height: 16),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
+                children: const [
+                  Text(
                     "Daftar Limit Kategori",
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                  ),
-                  InkWell(
-                    onTap: _addNewCategoryBudget,
-                    child: Row(
-                      children: const [
-                        Icon(Icons.add_circle_outline, size: 16, color: AppTheme.primary),
-                        SizedBox(width: 4),
-                        Text(
-                          "+ Limit Kategori",
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -365,7 +443,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                                       ),
                                     ),
                                     InkWell(
-                                      onTap: () => _showEditCategoryLimitDialog(cat.name, limit),
+                                      onTap: () => _showEditCategoryLimitDialog(cat.name, limit, cat.icon, cat.color),
                                       borderRadius: BorderRadius.circular(8),
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),

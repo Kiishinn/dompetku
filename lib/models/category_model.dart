@@ -26,6 +26,31 @@ class CategoryModel {
     required this.group,
     this.isExpense = true,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'iconCodePoint': icon.codePoint,
+      'colorValue': color.value,
+      'groupName': group.name,
+      'isExpense': isExpense,
+    };
+  }
+
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
+    return CategoryModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      icon: IconData(json['iconCodePoint'] ?? Icons.category.codePoint, fontFamily: 'MaterialIcons'),
+      color: Color(json['colorValue'] ?? AppTheme.primary.value),
+      group: CategoryGroup.values.firstWhere(
+        (g) => g.name == (json['groupName'] ?? 'gayaHidup'),
+        orElse: () => CategoryGroup.gayaHidup,
+      ),
+      isExpense: json['isExpense'] ?? true,
+    );
+  }
 }
 
 class AppCategories {

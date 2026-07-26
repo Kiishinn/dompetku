@@ -74,7 +74,7 @@ class AppState extends ChangeNotifier {
   String userEmail = 'Email belum diatur';
 
   // Reactive Category List (Re-orderable by User!)
-  final List<CategoryModel> _categories = List.from(AppCategories.allCategories);
+  List<CategoryModel> _categories = [...AppCategories.allCategories, ...AppCategories.incomeCategories];
 
   // Category Budget Limits (Map of Category Name -> Limit Amount)
   Map<String, double> _categoryBudgets = {};
@@ -98,6 +98,14 @@ class AppState extends ChangeNotifier {
     final savedGoals = await StorageService.instance.loadSavingsGoals();
     final savedBills = await StorageService.instance.loadRecurringBills();
     final savedNotifiedKeys = await StorageService.instance.loadNotifiedKeys();
+
+    final savedCategories = await StorageService.instance.loadCategories();
+    if (savedCategories.isNotEmpty) {
+      _categories = savedCategories;
+    } else {
+      _categories = [...AppCategories.allCategories, ...AppCategories.incomeCategories];
+      await StorageService.instance.saveCategories(_categories);
+    }
 
     final savedNotifsRaw = await StorageService.instance.loadNotificationsRaw();
     if (savedNotifsRaw.isNotEmpty) {
@@ -154,7 +162,7 @@ class AppState extends ChangeNotifier {
   }
 
   List<CategoryModel> get categories => List.unmodifiable(_categories);
-  List<CategoryModel> get quickCategories => _categories.take(4).toList();
+  List<CategoryModel> get quickCategories => _categories.where((c) => c.isExpense != false).take(4).toList();
 
   Map<String, double> get categoryBudgets => Map.unmodifiable(_categoryBudgets);
 
@@ -399,17 +407,74 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  void reorderCategories(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
-    final item = _categories.removeAt(oldIndex);
-    _categories.insert(newIndex, item);
+  void swapCategorySlots(int oldIdx, int newIdx, {bool isExpense = true}) {
+    final subset = _categories.where((c) => (c.isExpense == isExpense)).toList();
+    if (oldIdx < 0 || oldIdx >= subset.length || newIdx < 0 || newIdx >= subset.length || oldIdx == newIdx) return;
+
+    final temp = subset[oldIdx];
+    subset[oldIdx] = subset[newIdx];
+    subset[newIdx] = temp;
+
+    final opposite = _categories.where((c) => (c.isExpense != isExpense)).toList();
+    _categories = isExpense ? [...subset, ...opposite] : [...opposite, ...subset];
+
+    StorageService.instance.saveCategories(_categories);
+    notifyListeners();
+  }
+
+  void reorderCategories(int oldIndex, int newIndex, {bool isExpense = true}) {
+    final subset = _categories.where((c) => (c.isExpense == isExpense)).toList();
+    if (oldIndex < 0 || oldIndex >= subset.length || newIndex < 0 || newIndex >= subset.length) return;
+    if (newIndex > oldIndex) newIndex -= 1;
+    final item = subset.removeAt(oldIndex);
+    subset.insert(newIndex, item);
+    final opposite = _categories.where((c) => (c.isExpense != isExpense)).toList();
+    _categories = isExpense ? [...subset, ...opposite] : [...opposite, ...subset];
+    StorageService.instance.saveCategories(_categories);
     notifyListeners();
   }
 
   void addCustomCategory(CategoryModel cat) {
     _categories.insert(0, cat);
+    StorageService.instance.saveCategories(_categories);
+    notifyListeners();
+  }
+
+  void updateCategory(String id, CategoryModel updatedCat) {
+    int idx = _categories.indexWhere((c) => c.id == id);
+    if (idx != -1) {
+      final oldCatName = _categories[idx].name;
+      _categories[idx] = updatedCat;
+      
+      if (_categoryBudgets.containsKey(oldCatName) && oldCatName != updatedCat.name) {
+        final val = _categoryBudgets.remove(oldCatName)!;
+        _categoryBudgets[updatedCat.name] = val;
+        StorageService.instance.saveCategoryBudgets(_categoryBudgets);
+      }
+
+      StorageService.instance.saveCategories(_categories);
+      notifyListeners();
+    }
+  }
+
+  CategoryModel? deleteCategory(String id) {
+    int idx = _categories.indexWhere((c) => c.id == id);
+    if (idx != -1) {
+      final removed = _categories.removeAt(idx);
+      StorageService.instance.saveCategories(_categories);
+      notifyListeners();
+      return removed;
+    }
+    return null;
+  }
+
+  void restoreCategory(CategoryModel cat, {int? index}) {
+    if (index != null && index >= 0 && index <= _categories.length) {
+      _categories.insert(index, cat);
+    } else {
+      _categories.add(cat);
+    }
+    StorageService.instance.saveCategories(_categories);
     notifyListeners();
   }
 

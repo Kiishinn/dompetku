@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/transaction_model.dart';
 import '../models/savings_goal_model.dart';
 import '../models/recurring_bill_model.dart';
+import '../models/category_model.dart';
 import '../screens/dompet_screen.dart';
 
 class StorageService {
@@ -12,6 +13,7 @@ class StorageService {
   static const String _keyTransactions = 'dompetku_transactions';
   static const String _keyWallets = 'dompetku_wallets';
   static const String _keyBudgets = 'dompetku_budgets';
+  static const String _keyCategories = 'dompetku_categories';
   static const String _keyNotifEnabled = 'dompetku_notif_enabled';
 
   SharedPreferences? _prefs;
@@ -60,7 +62,7 @@ class StorageService {
     }
   }
 
-  // Category Budgets
+  // Category Budgets & Categories
   Future<void> saveCategoryBudgets(Map<String, double> budgets) async {
     await init();
     await _prefs?.setString(_keyBudgets, jsonEncode(budgets));
@@ -76,6 +78,25 @@ class StorageService {
       return decoded.map((key, value) => MapEntry(key, (value as num).toDouble()));
     } catch (_) {
       return {};
+    }
+  }
+
+  Future<void> saveCategories(List<CategoryModel> categories) async {
+    await init();
+    final jsonList = categories.map((c) => c.toJson()).toList();
+    await _prefs?.setString(_keyCategories, jsonEncode(jsonList));
+  }
+
+  Future<List<CategoryModel>> loadCategories() async {
+    await init();
+    final jsonString = _prefs?.getString(_keyCategories);
+    if (jsonString == null || jsonString.isEmpty) return [];
+
+    try {
+      final List<dynamic> decoded = jsonDecode(jsonString);
+      return decoded.map((item) => CategoryModel.fromJson(item as Map<String, dynamic>)).toList();
+    } catch (_) {
+      return [];
     }
   }
 
