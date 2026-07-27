@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/category_model.dart';
 import '../../models/app_state.dart';
 import '../../theme/app_theme.dart';
+import 'tambah_kategori_sheet.dart';
 
 class PilihKategoriSheet extends StatefulWidget {
   final Function(CategoryModel)? onSelectCategory;
@@ -41,205 +42,10 @@ class PilihKategoriSheet extends StatefulWidget {
     Function(CategoryModel)? onSelect, {
     bool defaultIsExpense = true,
   }) {
-    final TextEditingController nameController = TextEditingController();
-    IconData selectedIcon = Icons.star;
-    Color selectedColor = AppTheme.primary;
-    bool isExpenseType = defaultIsExpense;
-
-    final List<IconData> availableIcons = [
-      Icons.restaurant,
-      Icons.directions_car,
-      Icons.shopping_bag_outlined,
-      Icons.home_outlined,
-      Icons.work_outline,
-      Icons.laptop_chromebook,
-      Icons.card_giftcard,
-      Icons.trending_up,
-      Icons.sports_esports_outlined,
-      Icons.flight_takeoff,
-      Icons.medical_services_outlined,
-      Icons.school_outlined,
-      Icons.bolt,
-      Icons.local_gas_station,
-      Icons.pets,
-      Icons.star_outline,
-    ];
-
-    final List<Color> availableColors = [
-      AppTheme.primary,
-      AppTheme.incomeGreen,
-      AppTheme.expenseRed,
-      AppTheme.warningAmber,
-      AppTheme.purpleAccent,
-      AppTheme.pinkAccent,
-      AppTheme.accentBlue,
-      Colors.teal,
-    ];
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: AppTheme.surface,
-          title: const Text("Tambah Kategori Baru", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textPrimary)),
-          content: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Category Type Switcher
-                const Text("Tipe Kategori:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setDialogState(() => isExpenseType = true),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isExpenseType ? AppTheme.surface : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: isExpenseType ? AppTheme.cardShadow : null,
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Pengeluaran',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setDialogState(() => isExpenseType = false),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: !isExpenseType ? AppTheme.surface : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: !isExpenseType ? AppTheme.cardShadow : null,
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Pemasukan',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: !isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Name Input
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    labelText: "Nama Kategori",
-                    hintText: isExpenseType ? "Misal: Langganan Netflix, Kopi" : "Misal: Komisi Jualan, Dividen",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Icon Grid
-                const Text("Pilih Ikon:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: availableIcons.map((ic) {
-                    final isSel = selectedIcon == ic;
-                    return InkWell(
-                      onTap: () => setDialogState(() => selectedIcon = ic),
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isSel ? AppTheme.primaryContainer : AppTheme.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(10),
-                          border: isSel ? Border.all(color: AppTheme.primary, width: 2) : null,
-                        ),
-                        child: Icon(ic, color: isSel ? AppTheme.primary : AppTheme.textSecondary, size: 22),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-
-                // Color Swatches
-                const Text("Pilih Warna:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: availableColors.map((col) {
-                    final isSel = selectedColor == col;
-                    return GestureDetector(
-                      onTap: () => setDialogState(() => selectedColor = col),
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: col,
-                          shape: BoxShape.circle,
-                          border: isSel ? Border.all(color: Colors.white, width: 3) : null,
-                          boxShadow: isSel ? [BoxShadow(color: col.withOpacity(0.6), blurRadius: 6)] : null,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.trim().isNotEmpty) {
-                  final newCat = CategoryModel(
-                    id: 'cat_custom_${DateTime.now().millisecondsSinceEpoch}',
-                    name: nameController.text.trim(),
-                    icon: selectedIcon,
-                    color: selectedColor,
-                    group: CategoryGroup.gayaHidup,
-                    isExpense: isExpenseType,
-                  );
-                  AppState.instance.addCustomCategory(newCat);
-                  Navigator.pop(ctx);
-                  if (onSelect != null) onSelect(newCat);
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-              child: const Text("Simpan Kategori", style: TextStyle(color: AppTheme.textOnPrimary)),
-            ),
-          ],
-        ),
-      ),
+    TambahKategoriSheet.show(
+      context,
+      onCategorySaved: onSelect,
+      defaultIsExpense: defaultIsExpense,
     );
   }
 
@@ -308,7 +114,7 @@ class PilihKategoriSheet extends StatefulWidget {
               subtitle: const Text("Buang dari daftar inventory Anda", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
               onTap: () {
                 Navigator.pop(ctx);
-                _executeDeleteWithUndo(context, cat);
+                _showDeleteConfirmationDialog(context, cat);
               },
             ),
           ],
@@ -317,190 +123,118 @@ class PilihKategoriSheet extends StatefulWidget {
     );
   }
 
-  static void _executeDeleteWithUndo(BuildContext context, CategoryModel cat) {
-    final index = AppState.instance.categories.indexWhere((c) => c.id == cat.id);
-    final deleted = AppState.instance.deleteCategory(cat.id);
-    if (deleted != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Kategori '${cat.name}' telah dibuang.", style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600)),
-          backgroundColor: AppTheme.surfaceVariant,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          action: SnackBarAction(
-            label: "BATALKAN (UNDO)",
-            textColor: AppTheme.primary,
-            onPressed: () {
-              AppState.instance.restoreCategory(deleted, index: index >= 0 ? index : null);
-            },
+  static void _showDeleteConfirmationDialog(BuildContext context, CategoryModel cat) {
+    showDialog(
+      context: context,
+      builder: (delCtx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 10,
+        backgroundColor: AppTheme.surface,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.expenseRed.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.delete_forever_rounded, color: AppTheme.expenseRed, size: 40),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                "Hapus Kategori '${cat.name}'?",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimary,
+                  letterSpacing: -0.4,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Kategori ini akan dihapus dari daftar pilihan Anda. Transaksi lama yang sudah tercatat memakai kategori ini tetap tersimpan dengan aman.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13.5,
+                  color: AppTheme.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 26),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(delCtx),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(color: AppTheme.outlineVariant.withOpacity(0.8), width: 1.5),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text(
+                        "Batal",
+                        style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(delCtx);
+                        AppState.instance.deleteCategory(cat.id);
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    "Kategori '${cat.name}' telah berhasil dihapus.",
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            backgroundColor: AppTheme.expenseRed,
+                            behavior: SnackBarBehavior.floating,
+                            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            duration: const Duration(milliseconds: 2200),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppTheme.expenseRed,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: const Text(
+                        "Ya, Hapus",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          duration: const Duration(seconds: 4),
         ),
-      );
-    }
+      ),
+    );
   }
 
   static void _showEditCategoryDialog(BuildContext context, CategoryModel oldCat) {
-    final TextEditingController nameController = TextEditingController(text: oldCat.name);
-    IconData selectedIcon = oldCat.icon;
-    Color selectedColor = oldCat.color;
-    bool isExpenseType = oldCat.isExpense;
-
-    final List<IconData> availableIcons = [
-      Icons.restaurant, Icons.directions_car, Icons.shopping_bag_outlined, Icons.home_outlined,
-      Icons.work_outline, Icons.laptop_chromebook, Icons.card_giftcard, Icons.trending_up,
-      Icons.sports_esports_outlined, Icons.flight_takeoff, Icons.medical_services_outlined, Icons.school_outlined,
-      Icons.bolt, Icons.local_gas_station, Icons.pets, Icons.star_outline,
-    ];
-
-    final List<Color> availableColors = [
-      AppTheme.primary, AppTheme.incomeGreen, AppTheme.expenseRed, AppTheme.warningAmber,
-      AppTheme.purpleAccent, AppTheme.pinkAccent, AppTheme.accentBlue, Colors.teal,
-    ];
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: AppTheme.surface,
-          title: const Text("Edit Kategori", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textPrimary)),
-          content: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Tipe Kategori:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: AppTheme.surfaceContainerLow, borderRadius: BorderRadius.circular(16)),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setDialogState(() => isExpenseType = true),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isExpenseType ? AppTheme.surface : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: isExpenseType ? AppTheme.cardShadow : null,
-                            ),
-                            child: Center(
-                              child: Text('Pengeluaran', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setDialogState(() => isExpenseType = false),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: !isExpenseType ? AppTheme.surface : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: !isExpenseType ? AppTheme.cardShadow : null,
-                            ),
-                            child: Center(
-                              child: Text('Pemasukan', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: !isExpenseType ? AppTheme.textPrimary : AppTheme.textSecondary)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text("Nama Kategori:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    hintText: "Contoh: Kuliner Harian",
-                    filled: true,
-                    fillColor: AppTheme.surfaceContainerLow,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text("Pilih Ikon:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: availableIcons.map((ic) {
-                    final isSel = selectedIcon == ic || selectedIcon.codePoint == ic.codePoint;
-                    return InkWell(
-                      onTap: () => setDialogState(() => selectedIcon = ic),
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isSel ? selectedColor.withOpacity(0.2) : AppTheme.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(10),
-                          border: isSel ? Border.all(color: selectedColor, width: 2) : null,
-                        ),
-                        child: Icon(ic, color: isSel ? selectedColor : AppTheme.textSecondary, size: 22),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                const Text("Pilih Warna:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: availableColors.map((col) {
-                    final isSel = selectedColor.value == col.value;
-                    return GestureDetector(
-                      onTap: () => setDialogState(() => selectedColor = col),
-                      child: Container(
-                        width: 34,
-                        height: 34,
-                        decoration: BoxDecoration(
-                          color: col,
-                          shape: BoxShape.circle,
-                          border: isSel ? Border.all(color: Colors.white, width: 3) : null,
-                          boxShadow: isSel ? [BoxShadow(color: col.withOpacity(0.6), blurRadius: 6)] : null,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.trim().isNotEmpty) {
-                  final updatedCat = CategoryModel(
-                    id: oldCat.id,
-                    name: nameController.text.trim(),
-                    icon: selectedIcon,
-                    color: selectedColor,
-                    group: oldCat.group,
-                    isExpense: isExpenseType,
-                  );
-                  AppState.instance.updateCategory(oldCat.id, updatedCat);
-                  Navigator.pop(ctx);
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-              child: const Text("Simpan Perubahan", style: TextStyle(color: AppTheme.textOnPrimary)),
-            ),
-          ],
-        ),
-      ),
+    TambahKategoriSheet.show(
+      context,
+      existingCategory: oldCat,
     );
   }
 

@@ -36,11 +36,34 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    // Default null: User must explicitly choose source wallet!
+    AppState.instance.addListener(_onAppStateChanged);
+  }
+
+  void _onAppStateChanged() {
+    bool shouldRebuild = false;
+    if (selectedCategory != null &&
+        !AppState.instance.categories.any((c) => c.id == selectedCategory!.id)) {
+      selectedCategory = null;
+      shouldRebuild = true;
+    }
+    if (selectedWalletName != null &&
+        !AppState.instance.wallets.any((w) => w.name == selectedWalletName)) {
+      selectedWalletName = null;
+      shouldRebuild = true;
+    }
+    if (targetWalletName != null &&
+        !AppState.instance.wallets.any((w) => w.name == targetWalletName)) {
+      targetWalletName = null;
+      shouldRebuild = true;
+    }
+    if (shouldRebuild && mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
+    AppState.instance.removeListener(_onAppStateChanged);
     titleController.dispose();
     noteController.dispose();
     nominalController.dispose();
@@ -788,37 +811,46 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               // Kategori Selection (Only shown for Expense and Income modes!)
               if (selectedTab != 2) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Kategori Transaksi (Wajib)',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                    ),
-                    Text(
-                      selectedCategory != null ? selectedCategory!.name : 'Belum Dipilih',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: selectedCategory != null ? AppTheme.primary : AppTheme.expenseRed,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
                 ListenableBuilder(
                   listenable: AppState.instance,
                   builder: (context, _) {
+                    // Validasi seketika: Jika kategori yang dipilih ternyata sudah dihapus, reset ke null!
+                    if (selectedCategory != null &&
+                        !AppState.instance.categories.any((c) => c.id == selectedCategory!.id)) {
+                      selectedCategory = null;
+                    }
+
                     final quickCats = isExpense
                         ? AppState.instance.quickCategories
                         : AppState.instance.categories.where((c) => !c.isExpense).take(4).toList();
                     final isOutsideSelected = selectedCategory != null &&
                         !quickCats.any((c) => c.id == selectedCategory!.id);
 
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ...quickCats.map((cat) {
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Kategori Transaksi (Wajib)',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                            ),
+                            Text(
+                              selectedCategory != null ? selectedCategory!.name : 'Belum Dipilih',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: selectedCategory != null ? AppTheme.primary : AppTheme.expenseRed,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ...quickCats.map((cat) {
                           final isSelected = selectedCategory?.id == cat.id;
                           return Expanded(
                             child: GestureDetector(
@@ -900,11 +932,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
 
               // Tanggal & Jam Selector Box (Interactive Date & Time Picker!)
               InkWell(
