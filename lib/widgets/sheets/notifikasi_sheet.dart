@@ -38,7 +38,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
 
         return Container(
           height: MediaQuery.of(context).size.height * 0.75,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppTheme.surface,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
@@ -74,10 +74,10 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                           color: AppTheme.primary.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_active, color: AppTheme.primary, size: 20),
+                        child: Icon(Icons.notifications_active, color: AppTheme.primary, size: 20),
                       ),
-                      const SizedBox(width: 10),
-                      const Text(
+                      SizedBox(width: 10),
+                      Text(
                         "Notifikasi & Peringatan",
                         style: TextStyle(
                           fontSize: 17,
@@ -89,13 +89,13 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppTheme.textSecondary, size: 22),
+                    icon: Icon(Icons.close, color: AppTheme.textSecondary, size: 22),
                     constraints: const BoxConstraints(),
                     padding: const EdgeInsets.all(4),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // Notifications List
               Expanded(
@@ -103,7 +103,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(Icons.notifications_off_outlined, size: 52, color: AppTheme.textLight),
                             SizedBox(height: 12),
                             Text(
@@ -158,7 +158,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                                   ),
                                   child: Icon(item.icon, color: item.iconColor, size: 22),
                                 ),
-                                const SizedBox(width: 14),
+                                SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +169,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                                           Expanded(
                                             child: Text(
                                               displayTitle,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppTheme.textPrimary,
@@ -178,14 +178,14 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                                           ),
                                           Text(
                                             item.formattedTime,
-                                            style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                            style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 6),
+                                      SizedBox(height: 6),
                                       Text(
                                         item.message,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12.5,
                                           color: AppTheme.textSecondary,
                                           height: 1.4,
@@ -202,7 +202,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                       ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -213,7 +213,7 @@ class _NotifikasiSheetState extends State<NotifikasiSheet> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Tutup",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textOnPrimary),
                   ),

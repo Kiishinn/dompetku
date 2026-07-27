@@ -71,7 +71,7 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Modern Interactive Capsule Indicator (Dots)
             Row(
@@ -154,9 +154,9 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                         color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 15),
+                      child: Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 15),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text(
                       'TOTAL SALDO',
                       style: TextStyle(
@@ -184,8 +184,8 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.add_rounded, color: Colors.white, size: 15),
-                            const SizedBox(width: 4),
+                            Icon(Icons.add_rounded, color: Colors.white, size: 15),
+                            SizedBox(width: 4),
                             Text(
                               'Dompet',
                               style: TextStyle(
@@ -198,7 +198,7 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     // Tombol Privasi Mata
                     InkWell(
                       onTap: () => appState.toggleBalanceHidden(),
@@ -229,7 +229,7 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                       : (isDeficit
                           ? CurrencyFormatter.format(0, showPrefix: true)
                           : CurrencyFormatter.format(totalBalance, showPrefix: true)),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w900,
                     color: AppTheme.textOnPrimary,
@@ -246,11 +246,11 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 14),
-                        const SizedBox(width: 4),
+                        Icon(Icons.warning_amber_rounded, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
                         Text(
                           'Defisit -${CurrencyFormatter.format(totalBalance.abs(), showPrefix: true)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -268,8 +268,8 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.swipe_outlined, color: Colors.white70, size: 14),
-                    const SizedBox(width: 6),
+                    Icon(Icons.swipe_outlined, color: Colors.white70, size: 14),
+                    SizedBox(width: 6),
                     Text(
                       'Geser kiri lihat rincian $walletCount dompet Anda',
                       style: TextStyle(
@@ -315,12 +315,12 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
   ) {
     // Kurasi Palet Gradien Ala Sultan Fintech Tier-1 berdasarkan urutan atau warna dompet
     final List<List<Color>> executiveGradients = [
-      const [Color(0xFF0A5C36), Color(0xFF032817)], // Emerald Green (Bank BCA / Mandiri / Syariah)
-      const [Color(0xFF6B21A8), Color(0xFF2A0D45)], // Royal Purple (OVO / Jenius)
-      const [Color(0xFF991B1B), Color(0xFF450A0A)], // Crimson Ruby (Tunai / CIMB)
-      const [Color(0xFF0D9488), Color(0xFF073C37)], // Teal Diamond (Gopay / Jago)
-      const [Color(0xFFB45309), Color(0xFF451E03)], // Sunset Amber (DANA / ShopeePay)
-      const [Color(0xFF334155), Color(0xFF0F172A)], // Slate Onyx (Investasi / Lainnya)
+      [Color(0xFF0A5C36), Color(0xFF032817)], // Emerald Green (Bank BCA / Mandiri / Syariah)
+      [Color(0xFF6B21A8), Color(0xFF2A0D45)], // Royal Purple (OVO / Jenius)
+      [Color(0xFF991B1B), Color(0xFF450A0A)], // Crimson Ruby (Tunai / CIMB)
+      [Color(0xFF0D9488), Color(0xFF073C37)], // Teal Diamond (Gopay / Jago)
+      [Color(0xFFB45309), Color(0xFF451E03)], // Sunset Amber (DANA / ShopeePay)
+      [Color(0xFF334155), Color(0xFF0F172A)], // Slate Onyx (Investasi / Lainnya)
     ];
 
     final gradient = executiveGradients[index % executiveGradients.length];
@@ -369,13 +369,13 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                         ),
                         child: Icon(wallet.iconData, color: Colors.white, size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           wallet.name.toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
@@ -402,9 +402,9 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.tune_rounded, color: Colors.white, size: 14),
-                            const SizedBox(width: 4),
-                            const Text(
+                            Icon(Icons.tune_rounded, color: Colors.white, size: 14),
+                            SizedBox(width: 4),
+                            Text(
                               'Sesuaikan',
                               style: TextStyle(
                                 fontSize: 11,
@@ -416,7 +416,7 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    SizedBox(width: 4),
                     // Tombol Privasi Mata
                     InkWell(
                       onTap: () => appState.toggleBalanceHidden(),
@@ -440,7 +440,7 @@ class _WalletCarouselCardState extends State<WalletCarouselCard> {
               appState.isBalanceHidden
                   ? 'Rp •••••••••'
                   : CurrencyFormatter.format(wallet.balance, showPrefix: true),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: Colors.white,

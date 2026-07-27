@@ -97,7 +97,7 @@ class SkorKesehatanSheet extends StatelessWidget {
 
         return Container(
           constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppTheme.surface,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
@@ -125,7 +125,7 @@ class SkorKesehatanSheet extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Skor Kesehatan Finansial",
                     style: TextStyle(
                       fontSize: 20,
@@ -135,11 +135,11 @@ class SkorKesehatanSheet extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                    icon: Icon(Icons.close, color: AppTheme.textSecondary),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               Expanded(
                 child: SingleChildScrollView(
@@ -152,19 +152,43 @@ class SkorKesehatanSheet extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary,
-                          borderRadius: BorderRadius.circular(20),
+                          gradient: AppTheme.isDarkMode
+                              ? const LinearGradient(
+                                  colors: [Color(0xFF0C192E), Color(0xFF162B50)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : const LinearGradient(
+                                  colors: [Color(0xFF1A365D), Color(0xFF24477E)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(
+                            color: AppTheme.isDarkMode ? const Color(0xFF3B82F6).withOpacity(0.45) : const Color(0xFF2563EB).withOpacity(0.3),
+                            width: 1.5,
+                          ),
                           boxShadow: AppTheme.primaryCardShadow,
                         ),
                         child: Column(
                           children: [
                             Container(
-                              width: 104,
-                              height: 104,
+                              width: 110,
+                              height: 110,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
+                                color: AppTheme.isDarkMode ? const Color(0xFF070E1A) : Colors.white.withOpacity(0.12),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: scoreColor, width: 3.5),
+                                border: Border.all(
+                                  color: AppTheme.getAdaptiveColor(scoreColor),
+                                  width: 4.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.getAdaptiveColor(scoreColor).withOpacity(0.3),
+                                    blurRadius: 12,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -173,7 +197,7 @@ class SkorKesehatanSheet extends StatelessWidget {
                                     "$finalScore",
                                     style: const TextStyle(
                                       fontSize: 34,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w900,
                                       color: Colors.white,
                                       height: 1.1,
                                     ),
@@ -183,19 +207,21 @@ class SkorKesehatanSheet extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: scoreColor,
+                                      color: AppTheme.getAdaptiveColor(scoreColor),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 18),
                             Text(
                               scoreMessage,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white.withOpacity(0.9),
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.95),
+                                height: 1.4,
                               ),
                             ),
                           ],
@@ -203,7 +229,7 @@ class SkorKesehatanSheet extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 24),
-                      const Text(
+                      Text(
                         "Insight Untukmu",
                         style: TextStyle(
                           fontSize: 16,
@@ -216,7 +242,7 @@ class SkorKesehatanSheet extends StatelessWidget {
                       ...insightWidgets,
 
                       const SizedBox(height: 24),
-                      const Text(
+                      Text(
                         "Status Anggaran Bulan Ini",
                         style: TextStyle(
                           fontSize: 16,
@@ -227,8 +253,17 @@ class SkorKesehatanSheet extends StatelessWidget {
                       const SizedBox(height: 12),
 
                       if (categoryBudgets.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppTheme.isDarkMode ? const Color(0xFF111A29) : AppTheme.surfaceContainerLow,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppTheme.isDarkMode ? const Color(0xFF233652) : AppTheme.outlineVariant.withOpacity(0.6),
+                              width: 1.2,
+                            ),
+                          ),
                           child: Text(
                             "Belum ada limit anggaran kategori yang diset.",
                             style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
@@ -261,21 +296,24 @@ class SkorKesehatanSheet extends StatelessWidget {
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
-                        height: 48,
+                        height: 50,
                         child: ElevatedButton(
                           onPressed: () => Navigator.pop(context),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primary,
+                            backgroundColor: AppTheme.isDarkMode ? const Color(0xFF2563EB) : AppTheme.primary,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(14),
                             ),
+                            elevation: AppTheme.isDarkMode ? 6 : 2,
+                            shadowColor: AppTheme.isDarkMode ? const Color(0xFF2563EB).withOpacity(0.4) : null,
                           ),
                           child: const Text(
                             "Mengerti",
                             style: TextStyle(
                               fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textOnPrimary,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
@@ -298,17 +336,38 @@ class SkorKesehatanSheet extends StatelessWidget {
     required String title,
     required String subtitle,
   }) {
+    final adaptiveTint = AppTheme.getAdaptiveColor(iconTint);
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(14),
+        color: AppTheme.isDarkMode ? const Color(0xFF111A29) : AppTheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.isDarkMode ? const Color(0xFF233652) : AppTheme.outlineVariant.withOpacity(0.7),
+          width: 1.2,
+        ),
+        boxShadow: [
+          if (!AppTheme.isDarkMode)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: iconTint, size: 24),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: adaptiveTint.withOpacity(0.14),
+              shape: BoxShape.circle,
+              border: Border.all(color: adaptiveTint.withOpacity(0.35), width: 1.0),
+            ),
+            child: Icon(icon, color: adaptiveTint, size: 22),
+          ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -316,16 +375,17 @@ class SkorKesehatanSheet extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: AppTheme.textPrimary,
+                    height: 1.3,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     color: AppTheme.textSecondary,
                     height: 1.4,
@@ -353,13 +413,18 @@ class SkorKesehatanSheet extends StatelessWidget {
     } else if (isWarning) {
       progressColor = AppTheme.warningAmber;
     }
+    progressColor = AppTheme.getAdaptiveColor(progressColor);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(14),
+        color: AppTheme.isDarkMode ? const Color(0xFF111A29) : AppTheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.isDarkMode ? const Color(0xFF233652) : AppTheme.outlineVariant.withOpacity(0.7),
+          width: 1.2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +434,7 @@ class SkorKesehatanSheet extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
@@ -391,14 +456,14 @@ class SkorKesehatanSheet extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 8,
-              backgroundColor: AppTheme.outlineVariant.withOpacity(0.4),
+              backgroundColor: AppTheme.isDarkMode ? const Color(0xFF1E2D44) : AppTheme.outlineVariant.withOpacity(0.4),
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             amountSpent,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               color: AppTheme.textSecondary,
             ),

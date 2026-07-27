@@ -55,7 +55,7 @@ class PilihKategoriSheet extends StatefulWidget {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
         ),
@@ -76,42 +76,42 @@ class PilihKategoriSheet extends StatefulWidget {
                   decoration: BoxDecoration(color: cat.color.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
                   child: Icon(cat.icon, color: cat.color, size: 24),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(cat.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
-                      Text(cat.isExpense ? "Kategori Pengeluaran" : "Kategori Pemasukan", style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+                      Text(cat.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                      Text(cat.isExpense ? "Kategori Pengeluaran" : "Kategori Pemasukan", style: TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
                     ],
                   ),
                 ),
-                IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close, color: AppTheme.textSecondary)),
+                IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: AppTheme.textSecondary)),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: AppTheme.accentBlue.withOpacity(0.15), shape: BoxShape.circle),
-                child: const Icon(Icons.edit_outlined, color: AppTheme.accentBlue),
+                child: Icon(Icons.edit_outlined, color: AppTheme.accentBlue),
               ),
-              title: const Text("Edit Kategori", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.textPrimary)),
-              subtitle: const Text("Ubah nama, warna, atau ikon kategori ini", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+              title: Text("Edit Kategori", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.textPrimary)),
+              subtitle: Text("Ubah nama, warna, atau ikon kategori ini", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showEditCategoryDialog(context, cat);
               },
             ),
-            const Divider(color: AppTheme.surfaceContainer, height: 20),
+            Divider(color: AppTheme.surfaceContainer, height: 20),
             ListTile(
               leading: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: AppTheme.expenseRed.withOpacity(0.15), shape: BoxShape.circle),
-                child: const Icon(Icons.delete_outline, color: AppTheme.expenseRed),
+                child: Icon(Icons.delete_outline, color: AppTheme.expenseRed),
               ),
-              title: const Text("Hapus Kategori", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.expenseRed)),
-              subtitle: const Text("Buang dari daftar inventory Anda", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+              title: Text("Hapus Kategori", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: AppTheme.expenseRed)),
+              subtitle: Text("Buang dari daftar inventory Anda", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
               onTap: () {
                 Navigator.pop(ctx);
                 _showDeleteConfirmationDialog(context, cat);
@@ -141,21 +141,21 @@ class PilihKategoriSheet extends StatefulWidget {
                   color: AppTheme.expenseRed.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.delete_forever_rounded, color: AppTheme.expenseRed, size: 40),
+                child: Icon(Icons.delete_forever_rounded, color: AppTheme.expenseRed, size: 40),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: 18),
               Text(
                 "Hapus Kategori '${cat.name}'?",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
                   letterSpacing: -0.4,
                 ),
               ),
-              const SizedBox(height: 10),
-              const Text(
+              SizedBox(height: 10),
+              Text(
                 "Kategori ini akan dihapus dari daftar pilihan Anda. Transaksi lama yang sudah tercatat memakai kategori ini tetap tersimpan dengan aman.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -164,7 +164,7 @@ class PilihKategoriSheet extends StatefulWidget {
                   height: 1.4,
                 ),
               ),
-              const SizedBox(height: 26),
+              SizedBox(height: 26),
               Row(
                 children: [
                   Expanded(
@@ -175,13 +175,13 @@ class PilihKategoriSheet extends StatefulWidget {
                         side: BorderSide(color: AppTheme.outlineVariant.withOpacity(0.8), width: 1.5),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Batal",
                         style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -192,12 +192,12 @@ class PilihKategoriSheet extends StatefulWidget {
                           SnackBar(
                             content: Row(
                               children: [
-                                const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-                                const SizedBox(width: 10),
+                                Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+                                SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
                                     "Kategori '${cat.name}' telah berhasil dihapus.",
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
                                   ),
                                 ),
                               ],
@@ -216,7 +216,7 @@ class PilihKategoriSheet extends StatefulWidget {
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Ya, Hapus",
                         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
@@ -256,7 +256,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -280,7 +280,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Pilih Kategori",
                 style: TextStyle(
                   fontSize: 20,
@@ -290,11 +290,11 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                icon: Icon(Icons.close, color: AppTheme.textSecondary),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           // Segmented Switcher: Pengeluaran vs Pemasukan inside Sheet!
           Container(
@@ -354,15 +354,15 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           // Search Bar
           TextField(
             onChanged: (val) => setState(() => searchQuery = val.toLowerCase()),
             decoration: InputDecoration(
               hintText: "Cari kategori...",
-              hintStyle: const TextStyle(color: AppTheme.textLight, fontSize: 14),
-              prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
+              hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 14),
+              prefixIcon: Icon(Icons.search, color: AppTheme.textSecondary),
               contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
               filled: true,
               fillColor: AppTheme.surfaceContainerLow,
@@ -372,7 +372,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Category Grid
           Expanded(
@@ -400,14 +400,14 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.inventory_2_outlined, size: 16, color: AppTheme.primary),
-                            const SizedBox(width: 8),
+                            Icon(Icons.inventory_2_outlined, size: 16, color: AppTheme.primary),
+                            SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 widget.isManageOnly
                                     ? "Mode Kelola: Ketuk item atau ikon titik tiga untuk edit & hapus. Tahan & geser untuk tukar urutan Hotbar (4 Slot Atas)."
                                     : "Ketuk untuk pilih transaksi. Geser untuk scroll. Tahan untuk angkat & atur Hotbar (4 Slot Atas). Ketuk 2x / ikon titik tiga untuk edit & hapus.",
-                                style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, height: 1.3),
+                                style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, height: 1.3),
                               ),
                             ),
                           ],
@@ -434,7 +434,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Add Custom Category Button
           SizedBox(
@@ -447,13 +447,13 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                   widget.onAddNewCategoryClick!();
                 }
               },
-              icon: const Icon(Icons.add, color: AppTheme.primary, size: 20),
-              label: const Text(
+              icon: Icon(Icons.add, color: AppTheme.primary, size: 20),
+              label: Text(
                 "Tambah Kategori Baru",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primary),
               ),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppTheme.primary),
+                side: BorderSide(color: AppTheme.primary),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
@@ -493,7 +493,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                   ),
                   child: Icon(cat.icon, color: cat.color, size: 20),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   cat.name,
                   maxLines: 1,
@@ -522,11 +522,11 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.star_rounded, color: Colors.white, size: 10),
-                    const SizedBox(width: 2),
+                    Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                    SizedBox(width: 2),
                     Text(
                       '${index + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -540,7 +540,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
             top: -10,
             right: -10,
             child: IconButton(
-              icon: const Icon(Icons.more_vert, size: 16, color: AppTheme.textSecondary),
+              icon: Icon(Icons.more_vert, size: 16, color: AppTheme.textSecondary),
               splashRadius: 16,
               onPressed: () => PilihKategoriSheet.showManageActionSheet(context, cat),
             ),
@@ -566,8 +566,8 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(cat.icon, color: cat.color, size: 28),
-              const SizedBox(height: 6),
-              Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+              SizedBox(height: 6),
+              Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
             ],
           ),
         ),
@@ -595,7 +595,7 @@ class _PilihKategoriSheetState extends State<PilihKategoriSheet> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppTheme.warningAmber, width: 2.5),
                   )
-                : const BoxDecoration(),
+                : BoxDecoration(),
             child: InkWell(
               onTap: () {
                 if (widget.isManageOnly) {

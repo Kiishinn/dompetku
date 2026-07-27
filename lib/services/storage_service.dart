@@ -16,6 +16,7 @@ class StorageService {
   static const String _keyCategories = 'dompetku_categories';
   static const String _keyNotifEnabled = 'dompetku_notif_enabled';
   static const String _keyBalanceHidden = 'dompetku_balance_hidden';
+  static const String _keyDarkMode = 'dompetku_dark_mode';
 
   SharedPreferences? _prefs;
 
@@ -110,6 +111,16 @@ class StorageService {
   Future<bool> loadNotificationEnabled() async {
     await init();
     return _prefs?.getBool(_keyNotifEnabled) ?? true;
+  }
+
+  Future<void> saveDarkMode(bool enabled) async {
+    await init();
+    await _prefs?.setBool(_keyDarkMode, enabled);
+  }
+
+  Future<bool> loadDarkMode() async {
+    await init();
+    return _prefs?.getBool(_keyDarkMode) ?? false;
   }
 
   // User Profile

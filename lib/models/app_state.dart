@@ -16,7 +16,8 @@ class NotificationItem {
   final DateTime timestamp;
   bool isRead;
   final IconData icon;
-  final Color iconColor;
+  final Color _iconColor;
+  Color get iconColor => AppTheme.getAdaptiveColor(_iconColor);
 
   NotificationItem({
     required this.id,
@@ -25,8 +26,8 @@ class NotificationItem {
     required this.timestamp,
     this.isRead = false,
     this.icon = Icons.notifications_active,
-    this.iconColor = AppTheme.primary,
-  });
+    Color iconColor = AppTheme.defaultPrimary,
+  }) : _iconColor = iconColor;
 
   String get formattedTime {
     final now = DateTime.now();
@@ -44,7 +45,7 @@ class NotificationItem {
         'timestamp': timestamp.toIso8601String(),
         'isRead': isRead,
         'iconCodePoint': icon.codePoint,
-        'iconColorValue': iconColor.value,
+        'iconColorValue': _iconColor.value,
       };
 
   factory NotificationItem.fromJson(Map<String, dynamic> json) {
@@ -55,7 +56,7 @@ class NotificationItem {
       timestamp: json['timestamp'] != null ? (DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()) : DateTime.now(),
       isRead: json['isRead'] == true,
       icon: IconData((json['iconCodePoint'] as num?)?.toInt() ?? Icons.notifications_active.codePoint, fontFamily: 'MaterialIcons'),
-      iconColor: Color((json['iconColorValue'] as num?)?.toInt() ?? AppTheme.primary.value),
+      iconColor: Color((json['iconColorValue'] as num?)?.toInt() ?? AppTheme.defaultPrimary.value),
     );
   }
 }
@@ -69,10 +70,18 @@ class AppState extends ChangeNotifier {
 
   bool isNotificationEnabled = true;
   bool isBalanceHidden = false;
+  bool isDarkMode = false;
 
   void toggleBalanceHidden() {
     isBalanceHidden = !isBalanceHidden;
     StorageService.instance.saveBalanceHidden(isBalanceHidden);
+    notifyListeners();
+  }
+
+  void toggleDarkMode([bool? val]) {
+    isDarkMode = val ?? !isDarkMode;
+    AppTheme.isDarkMode = isDarkMode;
+    StorageService.instance.saveDarkMode(isDarkMode);
     notifyListeners();
   }
 
@@ -170,6 +179,8 @@ class AppState extends ChangeNotifier {
     userName = userProfile['name'] ?? 'Pengguna Dompetku';
     userEmail = userProfile['email'] ?? 'Email belum diatur';
     isBalanceHidden = await StorageService.instance.loadBalanceHidden();
+    isDarkMode = await StorageService.instance.loadDarkMode();
+    AppTheme.isDarkMode = isDarkMode;
     _autoPurgeOldNotifications();
     _checkRecurringBillNotifications();
     _invalidateCaches();

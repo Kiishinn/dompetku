@@ -37,19 +37,19 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                         child: Container(
                           width: 40,
                           height: 40,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: AppTheme.surfaceContainer,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_back,
                             color: AppTheme.primary,
                             size: 20,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      const Text(
+                      SizedBox(width: 14),
+                      Text(
                         'Pilih Kategori',
                         style: TextStyle(
                           fontSize: 20,
@@ -125,7 +125,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
 
             // Search Bar
             Padding(
@@ -143,7 +143,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                       searchQuery = val.toLowerCase();
                     });
                   },
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Cari kategori...',
                     hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 15),
                     border: InputBorder.none,
@@ -154,7 +154,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Category Display Grid with Game Inventory Style
             Expanded(
@@ -172,7 +172,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                     }).toList();
 
                     if (filteredCats.isEmpty) {
-                      return const Padding(
+                      return Padding(
                         padding: EdgeInsets.symmetric(vertical: 40),
                         child: Center(
                           child: Text("Tidak ada kategori ditemukan", style: TextStyle(color: AppTheme.textSecondary)),
@@ -192,14 +192,14 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.inventory_2_outlined, size: 16, color: AppTheme.primary),
-                              const SizedBox(width: 8),
+                              Icon(Icons.inventory_2_outlined, size: 16, color: AppTheme.primary),
+                              SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   widget.isManageOnly
                                       ? "Mode Kelola: Ketuk item atau ikon titik tiga untuk edit & hapus. Tahan & geser untuk tukar urutan Hotbar (4 Slot Atas)."
                                       : "Ketuk untuk pilih. Geser untuk scroll. Tahan untuk angkat & atur Hotbar (4 Slot Atas). Ketuk 2x / ikon titik tiga untuk edit & hapus.",
-                                  style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, height: 1.3),
+                                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, height: 1.3),
                                 ),
                               ),
                             ],
@@ -262,7 +262,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                   ),
                   child: Icon(cat.icon, color: cat.color, size: 20),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   cat.name,
                   maxLines: 1,
@@ -291,11 +291,11 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.star_rounded, color: Colors.white, size: 10),
-                    const SizedBox(width: 2),
+                    Icon(Icons.star_rounded, color: Colors.white, size: 10),
+                    SizedBox(width: 2),
                     Text(
                       '${index + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -309,7 +309,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
             top: -10,
             right: -10,
             child: IconButton(
-              icon: const Icon(Icons.more_vert, size: 16, color: AppTheme.textSecondary),
+              icon: Icon(Icons.more_vert, size: 16, color: AppTheme.textSecondary),
               splashRadius: 16,
               onPressed: () => PilihKategoriSheet.showManageActionSheet(context, cat),
             ),
@@ -335,8 +335,8 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(cat.icon, color: cat.color, size: 28),
-              const SizedBox(height: 6),
-              Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+              SizedBox(height: 6),
+              Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
             ],
           ),
         ),
@@ -364,7 +364,7 @@ class _CategorySelectScreenState extends State<CategorySelectScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppTheme.warningAmber, width: 2.5),
                   )
-                : const BoxDecoration(),
+                : BoxDecoration(),
             child: InkWell(
               onTap: () {
                 if (widget.isManageOnly) {

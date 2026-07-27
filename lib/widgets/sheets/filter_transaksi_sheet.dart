@@ -83,7 +83,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppTheme.primary,
               onPrimary: Colors.white,
               surface: AppTheme.surface,
@@ -173,7 +173,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
 
     return Container(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.92),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28),
@@ -209,10 +209,10 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                       color: AppTheme.primary.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.tune_rounded, color: AppTheme.primary, size: 22),
+                    child: Icon(Icons.tune_rounded, color: AppTheme.primary, size: 22),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
+                  SizedBox(width: 12),
+                  Text(
                     "Pusat Riwayat & Filter",
                     style: TextStyle(
                       fontSize: 20,
@@ -233,7 +233,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: const Text(
+                      child: Text(
                         "Reset",
                         style: TextStyle(
                           fontSize: 13,
@@ -242,10 +242,10 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                         ),
                       ),
                     ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close_rounded, color: AppTheme.textSecondary),
+                    icon: Icon(Icons.close_rounded, color: AppTheme.textSecondary),
                     constraints: const BoxConstraints(),
                     padding: const EdgeInsets.all(6),
                   ),
@@ -253,7 +253,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
 
           // Kolom Pencarian Cerdas yang Mewah
           Container(
@@ -265,14 +265,14 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
             child: TextField(
               controller: _searchCtrl,
               onChanged: (val) => setState(() => searchQuery = val),
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 hintText: "Cari transaksi, kategori, atau dompet...",
-                hintStyle: const TextStyle(color: AppTheme.textLight, fontSize: 13.5, fontWeight: FontWeight.w400),
-                prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.primary, size: 22),
+                hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 13.5, fontWeight: FontWeight.w400),
+                prefixIcon: Icon(Icons.search_rounded, color: AppTheme.primary, size: 22),
                 suffixIcon: searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear_rounded, size: 18, color: AppTheme.textSecondary),
+                        icon: Icon(Icons.clear_rounded, size: 18, color: AppTheme.textSecondary),
                         onPressed: () {
                           _searchCtrl.clear();
                           setState(() => searchQuery = "");
@@ -284,7 +284,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           // Dropdown Kategori dan Dompet (Dipindahkan dari Beranda)
           Row(
@@ -306,7 +306,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                       child: Row(
                         children: [
                           if (filterCategory == null)
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(right: 8),
                               child: Icon(Icons.check_circle_rounded, size: 18, color: AppTheme.primary),
                             ),
@@ -326,7 +326,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                       child: Row(
                         children: [
                           if (filterCategory == cat)
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(right: 8),
                               child: Icon(Icons.check_circle_rounded, size: 18, color: AppTheme.primary),
                             ),
@@ -357,7 +357,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                     child: Row(
                       children: [
                         Icon(Icons.category_outlined, size: 18, color: filterCategory != null ? AppTheme.primary : AppTheme.textSecondary),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             filterCategory ?? 'Semua Kategori',
@@ -375,7 +375,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               // Dropdown Filter Dompet
               Expanded(
                 child: PopupMenuButton<String>(
@@ -393,7 +393,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                       child: Row(
                         children: [
                           if (filterWallet == null)
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(right: 8),
                               child: Icon(Icons.check_circle_rounded, size: 18, color: AppTheme.accentBlue),
                             ),
@@ -413,7 +413,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                       child: Row(
                         children: [
                           if (filterWallet == w)
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.only(right: 8),
                               child: Icon(Icons.check_circle_rounded, size: 18, color: AppTheme.accentBlue),
                             ),
@@ -444,7 +444,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                     child: Row(
                       children: [
                         Icon(Icons.account_balance_wallet_outlined, size: 18, color: filterWallet != null ? AppTheme.accentBlue : AppTheme.textSecondary),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             filterWallet ?? 'Semua Dompet',
@@ -464,7 +464,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Tab Jenis Transaksi: SEMUA, PEMASUKAN, PENGELUARAN
           SingleChildScrollView(
@@ -515,7 +515,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           // Kapsul Filter Periode Waktu
           SingleChildScrollView(
@@ -579,7 +579,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
 
           // Header Hasil Pencarian & Garis Pemisah
           Container(
@@ -592,7 +592,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               children: [
                 Text(
                   "Ditemukan ${filteredTransactions.length} Transaksi",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.textSecondary,
@@ -605,7 +605,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                       color: AppTheme.primary.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Filter Aktif",
                       style: TextStyle(
                         fontSize: 11,
@@ -617,7 +617,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
 
           // Daftar Transaksi Hasil Filter
           Expanded(
@@ -625,7 +625,7 @@ class _FilterTransaksiSheetState extends State<FilterTransaksiSheet> {
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.history_toggle_off_rounded, size: 52, color: AppTheme.textLight),
                         SizedBox(height: 12),
                         Text(

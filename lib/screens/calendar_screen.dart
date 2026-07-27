@@ -39,14 +39,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           color: AppTheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.account_balance_wallet,
                           color: AppTheme.primary,
                           size: 20,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      const Text(
+                      SizedBox(width: 10),
+                      Text(
                         'Beranda',
                         style: TextStyle(
                           fontSize: 22,
@@ -59,12 +59,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppTheme.surfaceContainer,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.person,
                         color: AppTheme.primary,
                         size: 22,
@@ -85,10 +85,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, size: 16, color: AppTheme.textPrimary),
+                    icon: Icon(Icons.arrow_back_ios, size: 16, color: AppTheme.textPrimary),
                     onPressed: () {},
                   ),
-                  const Text(
+                  Text(
                     'Juli 2026',
                     style: TextStyle(
                       fontSize: 18,
@@ -97,7 +97,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textPrimary),
+                    icon: Icon(Icons.arrow_forward_ios, size: 16, color: AppTheme.textPrimary),
                     onPressed: () {},
                   ),
                 ],
@@ -117,7 +117,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     child: Center(
                       child: Text(
                         day,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.textSecondary,
@@ -137,15 +137,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Column(
                 children: [
                   _buildWeekRow([null, null, null, 1, 2, 3, 4], [null, null, null, false, false, false, false]),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildWeekRow([5, 6, 7, 8, 9, 10, 11], [true, false, false, false, true, false, false]), // Dots on 5 and 9
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildWeekRow([12, 13, 14, 15, 16, 17, 18], [false, false, false, false, false, false, false]),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildWeekRow([19, 20, 21, 22, 23, 24, 25], [false, false, false, false, false, false, false]),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   _buildWeekRow([26, 27, 28, 29, 30, 31, null], [false, false, false, false, false, false, null]),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                 ],
               ),
             ),
@@ -154,7 +154,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           // Transaction Breakdown for selected date
           SliverToBoxAdapter(
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppTheme.surfaceContainerLow,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(28),
@@ -170,7 +170,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     children: [
                       Text(
                         '$selectedDay Juli 2026',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textPrimary,
@@ -178,19 +178,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                       Text(
                         '${displayTx.length} Transaksi',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: AppTheme.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   ...displayTx.map((tx) => TransactionItemWidget(
                     transaction: tx,
                     isCalendarStyle: true,
                   )),
-                  const SizedBox(height: 80),
+                  SizedBox(height: 80),
                 ],
               ),
             ),
@@ -209,7 +209,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final isSelected = day == selectedDay;
 
         if (day == null) {
-          return const SizedBox(width: 38, height: 44);
+          return SizedBox(width: 38, height: 44);
         }
 
         return GestureDetector(
@@ -241,13 +241,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     margin: const EdgeInsets.only(top: 3),
                     width: 5,
                     height: 5,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppTheme.incomeGreen,
                       shape: BoxShape.circle,
                     ),
                   )
                 else
-                  const SizedBox(height: 5),
+                  SizedBox(height: 5),
               ],
             ),
           ),

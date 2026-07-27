@@ -105,7 +105,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Silakan masukkan nama kategori terlebih dahulu.'),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
@@ -167,7 +167,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
     return Container(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
       padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28),
@@ -206,21 +206,21 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                           ),
                           child: Icon(_selectedIcon, color: _selectedColor, size: 26),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               isEditing ? "Edit Kategori" : "Tambah Kategori Baru",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.textPrimary,
                                 letterSpacing: -0.4,
                               ),
                             ),
-                            const SizedBox(height: 3),
-                            const Text(
+                            SizedBox(height: 3),
+                            Text(
                               "Kustomisasi ikon, warna, & jenis",
                               style: TextStyle(
                                 fontSize: 12.5,
@@ -233,10 +233,10 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: AppTheme.textSecondary, size: 22),
+                      icon: Icon(Icons.close, color: AppTheme.textSecondary, size: 22),
                       style: IconButton.styleFrom(
                         backgroundColor: AppTheme.surfaceContainerLow,
-                        shape: const CircleBorder(),
+                        shape: CircleBorder(),
                       ),
                     ),
                   ],
@@ -245,7 +245,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
             ),
           ),
 
-          const Divider(color: AppTheme.outlineVariant, height: 1, thickness: 0.5),
+          Divider(color: AppTheme.outlineVariant, height: 1, thickness: 0.5),
 
           // Scrollable content
           Expanded(
@@ -256,7 +256,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Category Type Selector
-                  const Text(
+                  Text(
                     "TIPE KATEGORI",
                     style: TextStyle(
                       fontSize: 12,
@@ -265,7 +265,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                       letterSpacing: 0.8,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
@@ -282,7 +282,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
-                                color: _isExpenseType ? Colors.white : Colors.transparent,
+                                color: _isExpenseType ? (AppTheme.isDarkMode ? AppTheme.surface : Colors.white) : Colors.transparent,
                                 borderRadius: BorderRadius.circular(14),
                                 border: _isExpenseType
                                     ? Border.all(color: AppTheme.expenseRed.withOpacity(0.4), width: 1.5)
@@ -305,7 +305,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                                     size: 18,
                                     color: _isExpenseType ? AppTheme.expenseRed : AppTheme.textSecondary,
                                   ),
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: 8),
                                   Text(
                                     'Pengeluaran',
                                     style: TextStyle(
@@ -319,7 +319,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: 4),
                         // Pemasukan button
                         Expanded(
                           child: GestureDetector(
@@ -328,7 +328,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
-                                color: !_isExpenseType ? Colors.white : Colors.transparent,
+                                color: !_isExpenseType ? (AppTheme.isDarkMode ? AppTheme.surface : Colors.white) : Colors.transparent,
                                 borderRadius: BorderRadius.circular(14),
                                 border: !_isExpenseType
                                     ? Border.all(color: AppTheme.incomeGreen.withOpacity(0.4), width: 1.5)
@@ -351,7 +351,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                                     size: 18,
                                     color: !_isExpenseType ? AppTheme.incomeGreen : AppTheme.textSecondary,
                                   ),
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: 8),
                                   Text(
                                     'Pemasukan',
                                     style: TextStyle(
@@ -369,10 +369,10 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // 2. Input Nama Kategori
-                  const Text(
+                  Text(
                     "NAMA KATEGORI",
                     style: TextStyle(
                       fontSize: 12,
@@ -381,16 +381,16 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                       letterSpacing: 0.8,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   TextField(
                     controller: _nameController,
                     textCapitalization: TextCapitalization.words,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
                     decoration: InputDecoration(
                       hintText: _isExpenseType
                           ? "Contoh: Kuliner Malam, Langganan Netflix, Kopi..."
                           : "Contoh: Komisi Freelance, Dividen, Cash & Reward...",
-                      hintStyle: const TextStyle(fontSize: 14, color: AppTheme.textLight, fontWeight: FontWeight.normal),
+                      hintStyle: TextStyle(fontSize: 14, color: AppTheme.textLight, fontWeight: FontWeight.normal),
                       filled: true,
                       fillColor: AppTheme.surfaceContainerLow,
                       prefixIcon: Icon(_selectedIcon, color: _selectedColor, size: 22),
@@ -410,10 +410,10 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // 3. Pilih Ikon Grid
-                  const Text(
+                  Text(
                     "PILIH IKON KATEGORI",
                     style: TextStyle(
                       fontSize: 12,
@@ -422,7 +422,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                       letterSpacing: 0.8,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -468,10 +468,10 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                     },
                   ),
 
-                  const SizedBox(height: 26),
+                  SizedBox(height: 26),
 
                   // 4. Pilih Warna Swatch
-                  const Text(
+                  Text(
                     "PILIH WARNA TEMA",
                     style: TextStyle(
                       fontSize: 12,
@@ -480,7 +480,7 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                       letterSpacing: 0.8,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Wrap(
                     spacing: 14,
                     runSpacing: 14,
@@ -517,14 +517,14 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                                   ],
                           ),
                           child: isSel
-                              ? const Icon(Icons.check_rounded, color: Colors.white, size: 22)
+                              ? Icon(Icons.check_rounded, color: Colors.white, size: 22)
                               : null,
                         ),
                       );
                     }).toList(),
                   ),
 
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
 
                   // Action Button
                   SizedBox(
@@ -532,10 +532,10 @@ class _TambahKategoriSheetState extends State<TambahKategoriSheet> {
                     height: 54,
                     child: ElevatedButton.icon(
                       onPressed: _saveCategory,
-                      icon: const Icon(Icons.check_circle_rounded, color: AppTheme.textOnPrimary, size: 22),
+                      icon: Icon(Icons.check_circle_rounded, color: AppTheme.textOnPrimary, size: 22),
                       label: Text(
                         isEditing ? "Simpan Perubahan" : "Simpan Kategori Baru",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textOnPrimary,

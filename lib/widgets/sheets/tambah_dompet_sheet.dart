@@ -75,7 +75,7 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Silakan masukkan nama akun / dompet terlebih dahulu.'),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
@@ -119,7 +119,7 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
 
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28),
@@ -160,10 +160,10 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                       ),
                       child: Icon(_iconData, color: _activeThemeColor, size: 26),
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: 14),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Tambah Dompet Baru",
                           style: TextStyle(
@@ -187,19 +187,19 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: AppTheme.textSecondary, size: 22),
+                  icon: Icon(Icons.close, color: AppTheme.textSecondary, size: 22),
                   style: IconButton.styleFrom(
                     backgroundColor: AppTheme.surfaceContainerLow,
-                    shape: const CircleBorder(),
+                    shape: CircleBorder(),
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 26),
+            SizedBox(height: 26),
 
             // 1. Pilih Tipe Akun (Interactive Cards)
-            const Text(
+            Text(
               "TIPE AKUN & DOMPET",
               style: TextStyle(
                 fontSize: 12,
@@ -208,11 +208,11 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                 letterSpacing: 0.8,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Row(
               children: _accountTypes.map((item) {
                 final isSelected = _selectedType == item['type'];
-                final cardColor = item['color'] as Color;
+                final cardColor = AppTheme.getAdaptiveColor(item['color'] as Color);
 
                 return Expanded(
                   child: GestureDetector(
@@ -249,7 +249,7 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? cardColor.withOpacity(0.15) : Colors.white,
+                                  color: isSelected ? cardColor.withOpacity(0.15) : (AppTheme.isDarkMode ? AppTheme.surfaceVariant : Colors.white),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -263,13 +263,13 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                                   right: -2,
                                   top: -2,
                                   child: Container(
-                                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                    decoration: BoxDecoration(color: AppTheme.isDarkMode ? AppTheme.surface : Colors.white, shape: BoxShape.circle),
                                     child: Icon(Icons.check_circle, size: 16, color: cardColor),
                                   ),
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             item['label'] as String,
                             textAlign: TextAlign.center,
@@ -287,10 +287,10 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
               }).toList(),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // 2. Input Nama Akun / Dompet
-            const Text(
+            Text(
               "NAMA AKUN / DOMPET",
               style: TextStyle(
                 fontSize: 12,
@@ -299,16 +299,16 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                 letterSpacing: 0.8,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             TextField(
               controller: _nameController,
               textCapitalization: TextCapitalization.words,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 hintText: _selectedType == 'Bank'
                     ? 'Misal: Bank BCA, Mandiri, BNI...'
                     : (_selectedType == 'E-Wallet' ? 'Misal: Gopay, OVO, DANA, ShopeePay...' : 'Misal: Kas Tunai, Dompet Harian...'),
-                hintStyle: const TextStyle(fontSize: 14, color: AppTheme.textLight, fontWeight: FontWeight.normal),
+                hintStyle: TextStyle(fontSize: 14, color: AppTheme.textLight, fontWeight: FontWeight.normal),
                 filled: true,
                 fillColor: AppTheme.surfaceContainerLow,
                 prefixIcon: Icon(_iconData, color: _activeThemeColor, size: 22),
@@ -328,10 +328,10 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // 3. Input Saldo Awal
-            const Text(
+            Text(
               "SALDO AWAL (RP)",
               style: TextStyle(
                 fontSize: 12,
@@ -340,15 +340,15 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
                 letterSpacing: 0.8,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             TextField(
               controller: _balanceController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 hintText: '0',
-                hintStyle: const TextStyle(fontSize: 18, color: AppTheme.textLight, fontWeight: FontWeight.normal),
+                hintStyle: TextStyle(fontSize: 18, color: AppTheme.textLight, fontWeight: FontWeight.normal),
                 filled: true,
                 fillColor: AppTheme.surfaceContainerLow,
                 prefixIcon: Container(
@@ -380,7 +380,7 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Action Button
             SizedBox(
@@ -388,8 +388,8 @@ class _TambahDompetSheetState extends State<TambahDompetSheet> {
               height: 54,
               child: ElevatedButton.icon(
                 onPressed: _saveWallet,
-                icon: const Icon(Icons.add_circle_outline, color: AppTheme.textOnPrimary, size: 22),
-                label: const Text(
+                icon: Icon(Icons.add_circle_outline, color: AppTheme.textOnPrimary, size: 22),
+                label: Text(
                   "Simpan & Hubungkan Dompet",
                   style: TextStyle(
                     fontSize: 16,

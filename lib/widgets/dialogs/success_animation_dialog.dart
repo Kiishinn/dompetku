@@ -83,7 +83,7 @@ class _SuccessAnimationDialogState extends State<SuccessAnimationDialog> with Si
                 ),
                 child: ScaleTransition(
                   scale: _checkAnimation,
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.check_circle_rounded,
                       color: AppTheme.incomeGreen,
@@ -93,27 +93,27 @@ class _SuccessAnimationDialogState extends State<SuccessAnimationDialog> with Si
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             Text(
               widget.title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textPrimary,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               widget.message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppTheme.textSecondary,
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               height: 42,
@@ -123,7 +123,7 @@ class _SuccessAnimationDialogState extends State<SuccessAnimationDialog> with Si
                   backgroundColor: AppTheme.incomeGreen,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text(
+                child: Text(
                   'Mantap!',
                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                 ),

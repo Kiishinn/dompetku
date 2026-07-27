@@ -18,7 +18,7 @@ class PanduanSheet extends StatelessWidget {
     return Container(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -29,7 +29,7 @@ class PanduanSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle Bar
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Container(
             width: 40,
             height: 4,
@@ -38,7 +38,7 @@ class PanduanSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Title
           Padding(
@@ -56,11 +56,11 @@ class PanduanSheet extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.menu_book_rounded,
+                  child: Icon(Icons.menu_book_rounded,
                       color: Colors.white, size: 22),
                 ),
-                const SizedBox(width: 14),
-                const Expanded(
+                SizedBox(width: 14),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -86,8 +86,8 @@ class PanduanSheet extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          const Divider(height: 1, color: AppTheme.outlineVariant),
+          SizedBox(height: 16),
+          Divider(height: 1, color: AppTheme.outlineVariant),
 
           // Scrollable Content
           Expanded(
@@ -98,7 +98,7 @@ class PanduanSheet extends StatelessWidget {
                   icon: Icons.account_balance_wallet,
                   iconColor: const Color(0xFF2563EB),
                   title: 'Memulai Dompetku',
-                  items: const [
+                  items: [
                     _GuideItem(
                       title: 'Beranda',
                       desc:
@@ -111,12 +111,12 @@ class PanduanSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildGuideSection(
                   icon: Icons.account_balance,
                   iconColor: const Color(0xFF10B981),
                   title: 'Mengelola Dompet',
-                  items: const [
+                  items: [
                     _GuideItem(
                       title: 'Membuat Dompet Baru',
                       desc:
@@ -134,12 +134,12 @@ class PanduanSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildGuideSection(
                   icon: Icons.receipt_long,
                   iconColor: const Color(0xFF8B5CF6),
                   title: 'Mencatat Transaksi',
-                  items: const [
+                  items: [
                     _GuideItem(
                       title: 'Menambah Transaksi',
                       desc:
@@ -157,12 +157,12 @@ class PanduanSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildGuideSection(
                   icon: Icons.insights,
                   iconColor: const Color(0xFFF59E0B),
                   title: 'Statistik & Anggaran',
-                  items: const [
+                  items: [
                     _GuideItem(
                       title: 'Grafik Pengeluaran',
                       desc:
@@ -180,12 +180,12 @@ class PanduanSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildGuideSection(
                   icon: Icons.update,
                   iconColor: const Color(0xFFEC4899),
                   title: 'Tagihan Rutin & Notifikasi',
-                  items: const [
+                  items: [
                     _GuideItem(
                       title: 'Tagihan Berulang',
                       desc:
@@ -203,12 +203,12 @@ class PanduanSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildGuideSection(
                   icon: Icons.settings_outlined,
                   iconColor: const Color(0xFF64748B),
                   title: 'Pengaturan Lainnya',
-                  items: const [
+                  items: [
                     _GuideItem(
                       title: 'Cadangkan & Pulihkan Data',
                       desc:
@@ -245,7 +245,7 @@ class PanduanSheet extends StatelessWidget {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.outlineVariant.withOpacity(0.7)),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
             color: Color(0x08002045),
             blurRadius: 12,
@@ -267,7 +267,7 @@ class PanduanSheet extends StatelessWidget {
           ),
           title: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -306,10 +306,10 @@ class PanduanSheet extends StatelessWidget {
                         color: iconColor,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Text(
                       item.desc,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppTheme.textSecondary,
                         height: 1.5,

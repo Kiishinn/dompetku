@@ -7,7 +7,8 @@ class SavingsGoalModel {
   final double targetAmount;
   double currentAmount;
   final IconData icon;
-  final Color color;
+  final Color _color;
+  Color get color => AppTheme.getAdaptiveColor(_color);
   final DateTime targetDate;
 
   SavingsGoalModel({
@@ -16,9 +17,9 @@ class SavingsGoalModel {
     required this.targetAmount,
     this.currentAmount = 0.0,
     required this.icon,
-    this.color = AppTheme.primary,
+    Color color = AppTheme.defaultPrimary,
     required this.targetDate,
-  });
+  }) : _color = color;
 
   double get progressPercentage {
     if (targetAmount <= 0) return 0.0;
@@ -35,7 +36,7 @@ class SavingsGoalModel {
       'targetAmount': targetAmount,
       'currentAmount': currentAmount,
       'iconCodePoint': icon.codePoint,
-      'colorValue': color.value,
+      'colorValue': _color.value,
       'targetDate': targetDate.toIso8601String(),
     };
   }

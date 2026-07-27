@@ -14,7 +14,8 @@ class CategoryModel {
   final String id;
   final String name;
   final IconData icon;
-  final Color color;
+  final Color _color;
+  Color get color => AppTheme.getAdaptiveColor(_color);
   final CategoryGroup group;
   final bool isExpense;
 
@@ -22,17 +23,17 @@ class CategoryModel {
     required this.id,
     required this.name,
     required this.icon,
-    this.color = AppTheme.primary,
+    Color color = AppTheme.defaultPrimary,
     required this.group,
     this.isExpense = true,
-  });
+  }) : _color = color;
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
       'iconCodePoint': icon.codePoint,
-      'colorValue': color.value,
+      'colorValue': _color.value,
       'groupName': group.name,
       'isExpense': isExpense,
     };
@@ -40,13 +41,13 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      icon: IconData(json['iconCodePoint'] ?? Icons.category.codePoint, fontFamily: 'MaterialIcons'),
-      color: Color(json['colorValue'] ?? AppTheme.primary.value),
+      id: json['id'],
+      name: json['name'],
+      icon: IconData(json['iconCodePoint'], fontFamily: 'MaterialIcons'),
+      color: Color(json['colorValue']),
       group: CategoryGroup.values.firstWhere(
-        (g) => g.name == (json['groupName'] ?? 'gayaHidup'),
-        orElse: () => CategoryGroup.gayaHidup,
+        (g) => g.name == json['groupName'],
+        orElse: () => CategoryGroup.kebutuhanUtama,
       ),
       isExpense: json['isExpense'] ?? true,
     );
@@ -54,7 +55,7 @@ class CategoryModel {
 }
 
 class AppCategories {
-  static const List<CategoryModel> incomeCategories = [
+  static List<CategoryModel> get incomeCategories => [
     CategoryModel(
       id: 'cat_salary',
       name: 'Gaji & Pendapatan',
@@ -97,7 +98,7 @@ class AppCategories {
     ),
   ];
 
-  static const List<CategoryModel> allCategories = [
+  static List<CategoryModel> get allCategories => [
     // Kebutuhan Utama
     CategoryModel(
       id: 'cat_food',

@@ -59,7 +59,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
         ),
         child: Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: AppTheme.primary,
@@ -105,19 +105,19 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                       ),
                       child: Icon(icon ?? Icons.tune, color: color ?? AppTheme.primary, size: 24),
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             categoryName,
-                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppTheme.textPrimary),
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppTheme.textPrimary),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 2),
-                          const Text(
+                          SizedBox(height: 2),
+                          Text(
                             'Kelola Batas Anggaran Bulanan',
                             style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.w500),
                           ),
@@ -125,13 +125,13 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, color: AppTheme.textSecondary, size: 22),
+                      icon: Icon(Icons.close_rounded, color: AppTheme.textSecondary, size: 22),
                       splashRadius: 20,
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Field Nominal Eksklusif
                 TextField(
@@ -142,36 +142,36 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                     FilteringTextInputFormatter.digitsOnly,
                     ThousandsSeparatorInputFormatter(),
                   ],
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
                   decoration: InputDecoration(
                     labelText: 'Nominal Limit Bulanan',
-                    labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+                    labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
                     prefixText: 'Rp ',
-                    prefixStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primary),
+                    prefixStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primary),
                     hintText: '0 (Bebas Limit)',
-                    hintStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: AppTheme.textLight),
+                    hintStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: AppTheme.textLight),
                     filled: true,
                     fillColor: AppTheme.surfaceContainerLow,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppTheme.outlineVariant),
+                      borderSide: BorderSide(color: AppTheme.outlineVariant),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppTheme.primary, width: 2),
+                      borderSide: BorderSide(color: AppTheme.primary, width: 2),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Chip Pilihan Nominal Cepat (Bebas Emoji)
-                const Text(
+                Text(
                   'Pilihan Nominal Cepat:',
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textSecondary),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -183,7 +183,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                     _buildQuickChip(controller, '5 Jt', 5000000),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // Tombol Aksi Simpan Megah
                 SizedBox(
@@ -216,7 +216,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                       shadowColor: AppTheme.primary.withOpacity(0.3),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Simpan & Terapkan Limit', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                    child: Text('Simpan & Terapkan Limit', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
                   ),
                 ),
               ],
@@ -230,7 +230,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -276,7 +276,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Kelola Limit Anggaran Kategori",
                     style: TextStyle(
                       fontSize: 18,
@@ -286,11 +286,11 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: AppTheme.textSecondary),
+                    icon: Icon(Icons.close, color: AppTheme.textSecondary),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               // Grand Total Budget Overview Banner
               Container(
@@ -312,13 +312,13 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                       "TOTAL KUOTA ANGGARAN KATEGORI",
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withOpacity(0.8), letterSpacing: 1),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           CurrencyFormatter.format(grandTotalLimit, showPrefix: true),
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -330,12 +330,12 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                             grandTotalRemaining >= 0
                                 ? "Sisa Jatah: ${CurrencyFormatter.format(grandTotalRemaining)}"
                                 : "Overbudget ${CurrencyFormatter.format(grandTotalRemaining.abs())}",
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
@@ -347,7 +347,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Text(
                       "Terpakai: ${CurrencyFormatter.format(grandTotalSpent)} dari total ${CurrencyFormatter.format(grandTotalLimit)}",
                       style: TextStyle(fontSize: 11, color: Colors.white.withOpacity(0.9)),
@@ -355,22 +355,22 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               Row(
-                children: const [
+                children: [
                   Text(
                     "Daftar Limit Kategori",
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
 
               // Categories List with Visual Progress Bars & Budget Quota!
               Expanded(
                 child: categories.isEmpty
-                    ? const Center(child: Text("Belum ada kategori."))
+                    ? Center(child: Text("Belum ada kategori."))
                     : ListView.builder(
                         physics: const BouncingScrollPhysics(),
                         itemCount: categories.length,
@@ -415,20 +415,20 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                                       ),
                                       child: Icon(cat.icon, color: cat.color, size: 20),
                                     ),
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             cat.name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: AppTheme.textPrimary,
                                             ),
                                           ),
-                                          const SizedBox(height: 2),
+                                          SizedBox(height: 2),
                                           Text(
                                             limit > 0
                                                 ? "Limit: ${CurrencyFormatter.format(limit)}"
@@ -453,7 +453,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                                           border: Border.all(color: AppTheme.primary.withOpacity(0.3)),
                                         ),
                                         child: Row(
-                                          children: const [
+                                          children: [
                                             Icon(Icons.edit, size: 13, color: AppTheme.primary),
                                             SizedBox(width: 4),
                                             Text(
@@ -467,7 +467,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                                   ],
                                 ),
                                 if (limit > 0) ...[
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: 10),
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(4),
                                     child: LinearProgressIndicator(
@@ -477,13 +477,13 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                                       valueColor: AlwaysStoppedAnimation<Color>(barColor),
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  SizedBox(height: 6),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         "Terpakai: ${CurrencyFormatter.format(spent)} ($percentInt%)",
-                                        style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                       ),
                                       Text(
                                         remaining >= 0
@@ -505,7 +505,7 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                       ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               // Save / Done Button
               SizedBox(
@@ -513,8 +513,8 @@ class _AturAnggaranSheetState extends State<AturAnggaranSheet> {
                 height: 48,
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.check_circle_outline, color: AppTheme.textOnPrimary, size: 20),
-                  label: const Text(
+                  icon: Icon(Icons.check_circle_outline, color: AppTheme.textOnPrimary, size: 20),
+                  label: Text(
                     "Selesai Pengaturan",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textOnPrimary),
                   ),

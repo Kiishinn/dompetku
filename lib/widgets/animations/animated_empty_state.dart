@@ -81,28 +81,28 @@ class _AnimatedEmptyStateState extends State<AnimatedEmptyState> with SingleTick
               child: Icon(widget.icon, size: 32, color: AppTheme.primary),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             widget.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             widget.message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               color: AppTheme.textSecondary,
               height: 1.4,
             ),
           ),
           if (widget.actionWidget != null) ...[
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             widget.actionWidget!,
           ],
         ],

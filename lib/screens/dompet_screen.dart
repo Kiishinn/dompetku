@@ -31,7 +31,8 @@ class WalletItem {
   Color get brandColor {
     try {
       final hex = colorHex.replaceAll('#', '');
-      return Color(int.parse('0xFF$hex'));
+      final col = Color(int.parse('0xFF$hex'));
+      return AppTheme.getAdaptiveColor(col);
     } catch (_) {
       return AppTheme.primary;
     }
@@ -76,7 +77,7 @@ class _DompetScreenState extends State<DompetScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Tambah Target Impian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text('Tambah Target Impian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -89,7 +90,7 @@ class _DompetScreenState extends State<DompetScreen> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               TextField(
                 controller: targetController,
                 keyboardType: TextInputType.number,
@@ -104,7 +105,7 @@ class _DompetScreenState extends State<DompetScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Batal', style: TextStyle(color: AppTheme.textSecondary))),
           ElevatedButton(
             onPressed: () {
               final title = titleController.text.trim();
@@ -126,7 +127,7 @@ class _DompetScreenState extends State<DompetScreen> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-            child: const Text('Simpan Target', style: TextStyle(color: Colors.white)),
+            child: Text('Simpan Target', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -140,13 +141,13 @@ class _DompetScreenState extends State<DompetScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Text('Setor Tabungan [${goal.title}]', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+        title: Text('Setor Tabungan [${goal.title}]', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Target: ${CurrencyFormatter.format(goal.targetAmount)} (${goal.percentageInt}% terkumpul)', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-            const SizedBox(height: 14),
+            Text('Target: ${CurrencyFormatter.format(goal.targetAmount)} (${goal.percentageInt}% terkumpul)', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+            SizedBox(height: 14),
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
@@ -160,7 +161,7 @@ class _DompetScreenState extends State<DompetScreen> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal', style: TextStyle(color: AppTheme.textSecondary))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Batal', style: TextStyle(color: AppTheme.textSecondary))),
           ElevatedButton(
             onPressed: () {
               final cleanStr = amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
@@ -178,7 +179,7 @@ class _DompetScreenState extends State<DompetScreen> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.incomeGreen, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-            child: const Text('Setor Tabungan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text('Setor Tabungan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -219,14 +220,14 @@ class _DompetScreenState extends State<DompetScreen> {
                               color: AppTheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.account_balance_wallet,
                               color: AppTheme.primary,
                               size: 20,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          const Text(
+                          SizedBox(width: 10),
+                          Text(
                             'Dompet & Akun',
                             style: TextStyle(
                               fontSize: 22,
@@ -243,12 +244,12 @@ class _DompetScreenState extends State<DompetScreen> {
                           Container(
                             width: 40,
                             height: 40,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: AppTheme.surfaceContainer,
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.notifications_outlined,
                                 color: AppTheme.primary,
                                 size: 22,
@@ -262,13 +263,13 @@ class _DompetScreenState extends State<DompetScreen> {
                               top: 2,
                               child: Container(
                                 padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: AppTheme.expenseRed,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Text(
                                   '${appState.unreadNotificationCount}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -329,7 +330,7 @@ class _DompetScreenState extends State<DompetScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Wrap(
                             crossAxisAlignment: WrapCrossAlignment.center,
                             spacing: 10,
@@ -339,7 +340,7 @@ class _DompetScreenState extends State<DompetScreen> {
                                   !appState.isBalanceHidden
                                       ? (isDeficit ? CurrencyFormatter.format(0, showPrefix: true) : CurrencyFormatter.format(totalBalance, showPrefix: true))
                                       : 'Rp •••••••••',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -355,11 +356,11 @@ class _DompetScreenState extends State<DompetScreen> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 14),
-                                    const SizedBox(width: 4),
+                                    Icon(Icons.warning_amber_rounded, color: Colors.white, size: 14),
+                                    SizedBox(width: 4),
                                     Text(
                                       'Defisit -${CurrencyFormatter.format(totalBalance.abs(), showPrefix: true)}',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -370,15 +371,15 @@ class _DompetScreenState extends State<DompetScreen> {
                               ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.account_balance_wallet,
                               color: AppTheme.incomeGreen,
                               size: 16,
                             ),
-                            const SizedBox(width: 6),
+                            SizedBox(width: 6),
                             Text(
                               '${wallets.length} Akun Terhubung',
                               style: TextStyle(
@@ -404,7 +405,7 @@ class _DompetScreenState extends State<DompetScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Daftar Akun & Dompet',
                         style: TextStyle(
                           fontSize: 18,
@@ -423,7 +424,7 @@ class _DompetScreenState extends State<DompetScreen> {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Icon(Icons.add_circle, color: AppTheme.primary, size: 18),
                               SizedBox(width: 6),
                               Text(
@@ -516,7 +517,7 @@ class _DompetScreenState extends State<DompetScreen> {
                       size: 22,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -525,18 +526,18 @@ class _DompetScreenState extends State<DompetScreen> {
                           wallet.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         Text(
                           '${wallet.type} • ${wallet.accountNumber}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             color: AppTheme.textSecondary,
                           ),
@@ -547,7 +548,7 @@ class _DompetScreenState extends State<DompetScreen> {
                 ],
               ),
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: 6),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -564,7 +565,7 @@ class _DompetScreenState extends State<DompetScreen> {
                         color: wallet.balance < 0 ? AppTheme.expenseRed : AppTheme.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       wallet.balance < 0 ? 'Defisit' : 'Aktif',
                       style: TextStyle(
@@ -575,8 +576,8 @@ class _DompetScreenState extends State<DompetScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.edit_note, color: AppTheme.textSecondary, size: 18),
+                SizedBox(width: 4),
+                Icon(Icons.edit_note, color: AppTheme.textSecondary, size: 18),
               ],
             ),
           ],

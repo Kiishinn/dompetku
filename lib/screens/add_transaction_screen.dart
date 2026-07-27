@@ -110,7 +110,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppTheme.primary,
               onPrimary: Colors.white,
               surface: AppTheme.surface,
@@ -167,20 +167,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         builder: (ctx) => AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           title: Row(
-            children: const [
+            children: [
               Icon(Icons.account_balance_wallet_outlined, color: AppTheme.expenseRed, size: 24),
               SizedBox(width: 8),
               Text("Belum Ada Dompet!", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             ],
           ),
-          content: const Text(
+          content: Text(
             "Anda belum memiliki dompet/rekening terhubung. Silakan buat dompet terlebih dahulu sebelum mencatat transaksi.",
             style: TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
+              child: Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -191,7 +191,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 backgroundColor: AppTheme.primary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              child: const Text("+ Buat Dompet", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text("+ Buat Dompet", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -204,7 +204,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text("Mohon masukkan nominal yang valid (> 0)"),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
@@ -216,19 +216,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (selectedTab == 2) {
       if (selectedWalletName == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Harap pilih dompet asal terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+          SnackBar(content: Text("Harap pilih dompet asal terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
         );
         return;
       }
       if (targetWalletName == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Harap pilih dompet tujuan terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+          SnackBar(content: Text("Harap pilih dompet tujuan terlebih dahulu!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
         );
         return;
       }
       if (selectedWalletName == targetWalletName) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Dompet asal dan dompet tujuan tidak boleh sama!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
+          SnackBar(content: Text("Dompet asal dan dompet tujuan tidak boleh sama!"), backgroundColor: AppTheme.expenseRed, behavior: SnackBarBehavior.floating),
         );
         return;
       }
@@ -258,7 +258,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     // MANDATORY CATEGORY VALIDATION
     if (selectedCategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text("Harap pilih kategori transaksi terlebih dahulu!"),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
@@ -270,7 +270,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     // MANDATORY WALLET SELECTION VALIDATION
     if (selectedWalletName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text("Harap pilih dompet / sumber dana terlebih dahulu!"),
           backgroundColor: AppTheme.expenseRed,
           behavior: SnackBarBehavior.floating,
@@ -293,7 +293,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             builder: (ctx) => AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               title: Row(
-                children: const [
+                children: [
                   Icon(Icons.warning_amber_rounded, color: AppTheme.warningAmber, size: 28),
                   SizedBox(width: 8),
                   Text("Peringatan Defisit", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
@@ -301,12 +301,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
               content: Text(
                 "Saldo dompet [$targetWallet] saat ini (${CurrencyFormatter.format(currentBalance)}) lebih kecil dari nominal pengeluaran (${CurrencyFormatter.format(amount)}).\n\nApakah Anda yakin ingin melanjutkan? Saldo dompet akan menjadi Defisit ${CurrencyFormatter.format(deficitAmount)}.",
-                style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
+                style: TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
-                  child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
+                  child: Text("Batal", style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(ctx, true),
@@ -314,7 +314,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     backgroundColor: AppTheme.expenseRed,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Tetap Simpan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: Text("Tetap Simpan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -381,10 +381,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 children: [
                   InkWell(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, color: AppTheme.primary, size: 24),
+                    child: Icon(Icons.arrow_back, color: AppTheme.primary, size: 24),
                   ),
-                  const SizedBox(width: 16),
-                  const Text(
+                  SizedBox(width: 16),
+                  Text(
                     'Tambah Transaksi',
                     style: TextStyle(
                       fontSize: 20,
@@ -394,7 +394,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // 3-Tab Segmented Switcher: Pengeluaran vs Pemasukan vs Transfer
               Container(
@@ -494,7 +494,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // Nominal Display Box
               GestureDetector(
@@ -509,20 +509,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Nominal (Tekan di mana saja pada kotak)',
                         style: TextStyle(fontSize: 13, color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             'Rp',
                             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primary),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: TextField(
                               focusNode: nominalFocusNode,
@@ -534,8 +534,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                 ThousandsSeparatorInputFormatter(),
                               ],
                               autofocus: false,
-                              style: const TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
-                              decoration: const InputDecoration(
+                              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                              decoration: InputDecoration(
                                 hintText: '0',
                                 hintStyle: TextStyle(color: AppTheme.textLight),
                                 border: InputBorder.none,
@@ -556,7 +556,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     color: AppTheme.expenseRed.withOpacity(0.12),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.close_rounded,
                                     size: 18,
                                     color: AppTheme.expenseRed,
@@ -571,7 +571,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               // Quick Nominal Shortcuts Row
               SingleChildScrollView(
@@ -601,7 +601,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             ),
                             child: Text(
                               item['label'] as String,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.primary,
@@ -614,7 +614,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // PILIH DOMPET / AKUN (Wallet Selector)
               Row(
@@ -624,9 +624,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     children: [
                       Text(
                         selectedTab == 2 ? 'Dari Dompet (Asal):' : (isExpense ? 'Sumber Dana (Dompet):' : 'Dompet Tujuan:'),
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Text(
                         selectedWalletName ?? 'Belum Dipilih',
                         style: TextStyle(
@@ -639,14 +639,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   InkWell(
                     onTap: _showAddQuickWalletDialog,
-                    child: const Text(
+                    child: Text(
                       '+ Tambah Dompet',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               wallets.isEmpty
                   ? Container(
                       width: double.infinity,
@@ -657,7 +657,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         border: Border.all(color: AppTheme.expenseRed.withOpacity(0.3)),
                       ),
                       child: Row(
-                        children: const [
+                        children: [
                           Icon(Icons.warning_amber_rounded, color: AppTheme.expenseRed, size: 20),
                           SizedBox(width: 8),
                           Expanded(
@@ -698,7 +698,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                       size: 18,
                                       color: isSel ? AppTheme.textOnPrimary : wallet.brandColor,
                                     ),
-                                    const SizedBox(width: 8),
+                                    SizedBox(width: 8),
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
@@ -730,18 +730,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               // TARGET WALLET SELECTOR FOR TRANSFER MODE
               if (selectedTab == 2) ...[
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Row(
                   children: [
-                    const Text('Ke Dompet (Tujuan):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
-                    const SizedBox(width: 8),
+                    Text('Ke Dompet (Tujuan):', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                    SizedBox(width: 8),
                     Text(
                       targetWalletName ?? 'Belum Dipilih',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: targetWalletName != null ? AppTheme.incomeGreen : AppTheme.expenseRed),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -767,7 +767,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             child: Row(
                               children: [
                                 Icon(wallet.iconData, size: 18, color: isSel ? AppTheme.incomeGreen : wallet.brandColor),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -785,7 +785,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ],
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // Title Input Box (Only shown for Expense & Income)
               if (selectedTab != 2) ...[
@@ -798,7 +798,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   child: TextField(
                     controller: titleController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       icon: Icon(Icons.edit_outlined, color: AppTheme.primary, size: 22),
                       hintText: 'Judul (Misal: Nasi Padang, Gaji Juli...)',
                       hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 14),
@@ -806,7 +806,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
 
               // Kategori Selection (Only shown for Expense and Income modes!)
@@ -832,7 +832,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Kategori Transaksi (Wajib)',
                               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                             ),
@@ -846,7 +846,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 14),
+                        SizedBox(height: 14),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -870,7 +870,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     ),
                                     child: Icon(cat.icon, color: isSelected ? AppTheme.textOnPrimary : cat.color, size: 24),
                                   ),
-                                  const SizedBox(height: 6),
+                                  SizedBox(height: 6),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 2),
                                     child: Text(
@@ -912,7 +912,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     size: 26,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
+                                SizedBox(height: 6),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 2),
                                   child: Text(
@@ -937,7 +937,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
           ],
 
               // Tanggal & Jam Selector Box (Interactive Date & Time Picker!)
@@ -953,27 +953,27 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.access_time_filled, color: AppTheme.primary, size: 24),
-                      const SizedBox(width: 16),
+                      Icon(Icons.access_time_filled, color: AppTheme.primary, size: 24),
+                      SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Tanggal & Jam Transaksi', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                            const SizedBox(height: 2),
+                            Text('Tanggal & Jam Transaksi', style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                            SizedBox(height: 2),
                             Text(
-                              '${selectedDate.day} ${const ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][selectedDate.month - 1]} ${selectedDate.year}, $formattedHour:$formattedMinute WIB',
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                              '${selectedDate.day} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agt", "Sep", "Okt", "Nov", "Des"][selectedDate.month - 1]} ${selectedDate.year}, $formattedHour:$formattedMinute WIB',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.edit_calendar, color: AppTheme.primary, size: 20),
+                      Icon(Icons.edit_calendar, color: AppTheme.primary, size: 20),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
 
 
@@ -987,7 +987,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
                 child: TextField(
                   controller: noteController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     icon: Icon(Icons.notes_outlined, color: AppTheme.primary, size: 22),
                     hintText: 'Tambahkan catatan opsional...',
                     hintStyle: TextStyle(color: AppTheme.textLight, fontSize: 14),
@@ -995,7 +995,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
 
               // Simpan Transaksi Button
               SizedBox(
@@ -1003,8 +1003,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 height: 56,
                 child: ElevatedButton.icon(
                   onPressed: _saveTransaction,
-                  icon: const Icon(Icons.check_circle_outline, color: AppTheme.textOnPrimary),
-                  label: const Text(
+                  icon: Icon(Icons.check_circle_outline, color: AppTheme.textOnPrimary),
+                  label: Text(
                     'Simpan Transaksi',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppTheme.textOnPrimary),
                   ),
@@ -1018,7 +1018,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              SizedBox(height: 40),
             ],
           ),
         ),

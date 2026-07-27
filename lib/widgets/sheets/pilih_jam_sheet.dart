@@ -89,7 +89,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
     final nowFormattedMinute = now.minute.toString().padLeft(2, '0');
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -106,13 +106,13 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Header Title & Fast 'Jam Sekarang' Button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Pilih Jam Transaksi (24 Jam)',
                 style: TextStyle(
                   fontSize: 17,
@@ -132,7 +132,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                   ),
                   child: Text(
                     'Sekarang ($nowFormattedHour:$nowFormattedMinute)',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: AppTheme.primary,
@@ -142,7 +142,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           // Big 24-Hour Display Box
           Container(
@@ -156,21 +156,21 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
               children: [
                 Text(
                   '$formattedHour : $formattedMinute',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 40,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                     letterSpacing: 2,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
+                  child: Text(
                     'WIB',
                     style: TextStyle(
                       fontSize: 13,
@@ -182,7 +182,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Quick Hour & Minute Shortcuts Row
           SingleChildScrollView(
@@ -223,7 +223,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                     ),
                   );
                 }),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 // Minute shortcuts (:00, :15, :30, :45)
                 ...[0, 15, 30, 45].map((m) {
                   final mStr = m.toString().padLeft(2, '0');
@@ -254,7 +254,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // 24-Hour Wheels Selector (Jam & Menit)
           SizedBox(
@@ -265,7 +265,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                 Expanded(
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Jam',
                         style: TextStyle(
                           fontSize: 12,
@@ -273,7 +273,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                           color: AppTheme.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Expanded(
                         child: CupertinoPicker(
                           itemExtent: 38,
@@ -302,7 +302,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                     ],
                   ),
                 ),
-                const Text(
+                Text(
                   ':',
                   style: TextStyle(
                     fontSize: 24,
@@ -314,7 +314,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                 Expanded(
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'Menit',
                         style: TextStyle(
                           fontSize: 12,
@@ -322,7 +322,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                           color: AppTheme.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Expanded(
                         child: CupertinoPicker(
                           itemExtent: 38,
@@ -354,7 +354,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Action Button
           SizedBox(
@@ -373,7 +373,7 @@ class _PilihJamSheetState extends State<PilihJamSheet> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Simpan Jam',
                 style: TextStyle(
                   fontSize: 16,

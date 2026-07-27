@@ -21,7 +21,7 @@ class TransactionItemWidget extends StatelessWidget {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(24),
@@ -55,28 +55,28 @@ class TransactionItemWidget extends StatelessWidget {
                   ),
                   child: Icon(transaction.icon, color: transaction.iconColor, size: 26),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         transaction.title,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(
                         '${transaction.categoryName} • ${transaction.displayWallet}',
-                        style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                        style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Divider(color: AppTheme.outlineVariant.withOpacity(0.5)),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             if (transaction.isRealTransfer) ...[
               () {
                 String fromW = transaction.displayWallet;
@@ -91,32 +91,32 @@ class TransactionItemWidget extends StatelessWidget {
                 return Column(
                   children: [
                     _buildDetailRow("Tipe Transaksi", "Transfer Internal Dana (Netral)"),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     _buildDetailRow("Dari Dompet (Asal)", fromW, isValueBold: true),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     _buildDetailRow("Ke Dompet (Tujuan)", toW, isValueBold: true, valueColor: AppTheme.incomeGreen),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     _buildDetailRow("Nominal Transfer", CurrencyFormatter.format(transaction.amount), isValueBold: true, valueColor: AppTheme.accentBlue),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     _buildDetailRow("Waktu & Tanggal", "${transaction.formattedDateLabel} (${transaction.date.day}/${transaction.date.month}/${transaction.date.year})"),
                   ],
                 );
               }(),
             ] else ...[
               _buildDetailRow("Nominal", CurrencyFormatter.format(transaction.amount, isIncome: transaction.isIncome == true, withSign: true), isValueBold: true, valueColor: transaction.amountColor),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _buildDetailRow("Tipe Transaksi", transaction.isIncome == true ? "Pemasukan (+)" : "Pengeluaran (-)"),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _buildDetailRow("Waktu & Tanggal", "${transaction.formattedDateLabel} (${transaction.date.day}/${transaction.date.month}/${transaction.date.year})"),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _buildDetailRow("Dompet / Akun", transaction.displayWallet),
             ],
             if (transaction.note.trim().isNotEmpty) ...[
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               Divider(color: AppTheme.outlineVariant.withOpacity(0.5)),
-              const SizedBox(height: 10),
-              const Text("Catatan Opsional:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-              const SizedBox(height: 4),
+              SizedBox(height: 10),
+              Text("Catatan Opsional:", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+              SizedBox(height: 4),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -126,11 +126,11 @@ class TransactionItemWidget extends StatelessWidget {
                 ),
                 child: Text(
                   transaction.note,
-                  style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
+                  style: TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
@@ -140,12 +140,12 @@ class TransactionItemWidget extends StatelessWidget {
                         context: context,
                         builder: (confirmCtx) => AlertDialog(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          title: const Text("Hapus Transaksi?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          title: Text("Hapus Transaksi?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           content: Text("Transaksi '${transaction.title}' sebesar ${CurrencyFormatter.format(transaction.amount)} akan dihapus dan saldo dompet akan disesuaikan kembali."),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(confirmCtx),
-                              child: const Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
+                              child: Text("Batal", style: TextStyle(color: AppTheme.textSecondary)),
                             ),
                             ElevatedButton(
                                 onPressed: () {
@@ -192,7 +192,7 @@ class TransactionItemWidget extends StatelessWidget {
                                                       "Transaksi '${transaction.title}' dihapus",
                                                       maxLines: 1,
                                                       overflow: TextOverflow.ellipsis,
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         color: Colors.white,
                                                         fontSize: 13,
                                                         fontWeight: FontWeight.w500,
@@ -212,7 +212,7 @@ class TransactionItemWidget extends StatelessWidget {
                                                       minimumSize: Size.zero,
                                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                     ),
-                                                    child: const Text(
+                                                    child: Text(
                                                       'BATALKAN',
                                                       style: TextStyle(
                                                         color: Color(0xFFFFC107),
@@ -250,22 +250,22 @@ class TransactionItemWidget extends StatelessWidget {
                                 backgroundColor: AppTheme.expenseRed,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
-                              child: const Text("Ya, Hapus", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              child: Text("Ya, Hapus", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
                       );
                     },
-                    icon: const Icon(Icons.delete_outline, color: AppTheme.expenseRed, size: 18),
-                    label: const Text("Hapus", style: TextStyle(color: AppTheme.expenseRed, fontWeight: FontWeight.bold)),
+                    icon: Icon(Icons.delete_outline, color: AppTheme.expenseRed, size: 18),
+                    label: Text("Hapus", style: TextStyle(color: AppTheme.expenseRed, fontWeight: FontWeight.bold)),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppTheme.expenseRed),
+                      side: BorderSide(color: AppTheme.expenseRed),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(ctx),
@@ -274,7 +274,7 @@ class TransactionItemWidget extends StatelessWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text("Tutup", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text("Tutup", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -289,7 +289,7 @@ class TransactionItemWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
+        Text(label, style: TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
         Text(
           value,
           style: TextStyle(
@@ -334,24 +334,24 @@ class TransactionItemWidget extends StatelessWidget {
                 size: 24,
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     transaction.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     '$dateLabel • ${transaction.categoryName} • $walletLabel',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -359,17 +359,17 @@ class TransactionItemWidget extends StatelessWidget {
                     ),
                   ),
                   if (hasNote) ...[
-                    const SizedBox(height: 3),
+                    SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.notes, size: 12, color: AppTheme.textSecondary),
-                        const SizedBox(width: 4),
+                        Icon(Icons.notes, size: 12, color: AppTheme.textSecondary),
+                        SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             transaction.note,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontStyle: FontStyle.italic,
                               color: AppTheme.textSecondary,
@@ -422,39 +422,39 @@ class TransactionItemWidget extends StatelessWidget {
                     size: 22,
                   ),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         transaction.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(
                         '$dateLabel • ${transaction.categoryName} • $walletLabel',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.textSecondary,
                         ),
                       ),
                       if (hasNote) ...[
-                        const SizedBox(height: 3),
+                        SizedBox(height: 3),
                         Row(
                           children: [
-                            const Icon(Icons.notes, size: 12, color: AppTheme.textSecondary),
-                            const SizedBox(width: 4),
+                            Icon(Icons.notes, size: 12, color: AppTheme.textSecondary),
+                            SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 transaction.note,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontStyle: FontStyle.italic,
                                   color: AppTheme.textSecondary,

@@ -89,7 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFFF8F9FF), Color(0xFFE5EEFF)],
             begin: Alignment.topCenter,
@@ -108,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     if (_currentPage < _pages.length - 1)
                       TextButton(
                         onPressed: _navigateToMain,
-                        child: const Text(
+                        child: Text(
                           'Lewati',
                           style: TextStyle(
                             fontSize: 14,
@@ -118,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       )
                     else
-                      const SizedBox(height: 48),
+                      SizedBox(height: 48),
                   ],
                 ),
               ),
@@ -162,7 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         );
                       }),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
 
                     // Action Button
                     SizedBox(
@@ -193,7 +193,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           _currentPage < _pages.length - 1
                               ? 'Selanjutnya'
                               : 'Mulai Sekarang',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
@@ -243,7 +243,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 48),
+          SizedBox(height: 48),
 
           // Subtitle Badge
           Container(
@@ -262,13 +262,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Title
           Text(
             data.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
               color: AppTheme.textPrimary,
@@ -276,13 +276,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 1.2,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Description
           Text(
             data.description,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               color: AppTheme.textSecondary,
               height: 1.6,

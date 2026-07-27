@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Color(0xFF1A365D), // Rich Deep Navy Blue
@@ -82,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(height: 40),
+              SizedBox(height: 40),
 
               // Center Logo & App Branding
               Column(
@@ -109,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
                           width: 2,
                         ),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           Icons.account_balance_wallet,
                           size: 48,
@@ -118,12 +118,12 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   FadeTransition(
                     opacity: _fadeAnimation,
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'Dompetku',
                           style: TextStyle(
                             fontSize: 32,
@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                             letterSpacing: -0.5,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           'Catatan Keuangan harian',
                           style: TextStyle(
@@ -165,7 +165,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       Text(
                         'v1.0.0 Pro • Financial Serenity',
                         style: TextStyle(

@@ -50,30 +50,30 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                   color: AppTheme.expenseRed.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.delete_forever_rounded, color: AppTheme.expenseRed, size: 40),
+                child: Icon(Icons.delete_forever_rounded, color: AppTheme.expenseRed, size: 40),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: 18),
               Text(
                 "Hapus Dompet '${widget.wallet.name}'?",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
                   letterSpacing: -0.4,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Text(
                 "Dompet ini akan dihapus dari daftar akun & dompet Anda. Anda dapat menambahkannya kembali di masa mendatang.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13.5,
                   color: AppTheme.textSecondary,
                   height: 1.4,
                 ),
               ),
-              const SizedBox(height: 26),
+              SizedBox(height: 26),
               Row(
                 children: [
                   Expanded(
@@ -84,13 +84,13 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                         side: BorderSide(color: AppTheme.outlineVariant.withOpacity(0.8), width: 1.5),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Batal",
                         style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -111,7 +111,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Ya, Hapus",
                         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
@@ -130,7 +130,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
     final cleanInput = _balanceController.text.replaceAll(RegExp(r'[^0-9]'), '');
     if (cleanInput.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text("Silakan masukkan saldo nyata terbaru terlebih dahulu."),
           backgroundColor: AppTheme.warningAmber,
           behavior: SnackBarBehavior.floating,
@@ -170,7 +170,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
 
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28),
@@ -211,11 +211,11 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                       ),
                       child: Icon(widget.wallet.iconData, color: brandColor, size: 26),
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: 14),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Sesuaikan Saldo",
                           style: TextStyle(
                             fontSize: 19,
@@ -224,10 +224,10 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                             letterSpacing: -0.4,
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        SizedBox(height: 3),
                         Text(
                           "Akun: ${widget.wallet.name} • ${widget.wallet.type}",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             color: AppTheme.textSecondary,
                             fontWeight: FontWeight.w500,
@@ -242,19 +242,19 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                     IconButton(
                       onPressed: _showDeleteConfirmation,
                       tooltip: "Hapus Dompet Ini",
-                      icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.expenseRed, size: 22),
+                      icon: Icon(Icons.delete_outline_rounded, color: AppTheme.expenseRed, size: 22),
                       style: IconButton.styleFrom(
                         backgroundColor: AppTheme.expenseRed.withOpacity(0.1),
-                        shape: const CircleBorder(),
+                        shape: CircleBorder(),
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: AppTheme.textSecondary, size: 20),
+                      icon: Icon(Icons.close, color: AppTheme.textSecondary, size: 20),
                       style: IconButton.styleFrom(
                         backgroundColor: AppTheme.surfaceContainerLow,
-                        shape: const CircleBorder(),
+                        shape: CircleBorder(),
                       ),
                     ),
                   ],
@@ -262,7 +262,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
               ],
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Kartu Saldo Saat Ini (Current Balance Display)
             Container(
@@ -284,7 +284,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.isDarkMode ? AppTheme.surfaceVariant : Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -296,12 +296,12 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                     ),
                     child: Icon(Icons.account_balance_wallet, color: brandColor, size: 22),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "SALDO TERCATAT SAAT INI",
                           style: TextStyle(
                             fontSize: 11,
@@ -310,7 +310,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                             letterSpacing: 0.8,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           CurrencyFormatter.format(widget.wallet.balance, showPrefix: true),
                           style: TextStyle(
@@ -327,10 +327,10 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
               ),
             ),
 
-            const SizedBox(height: 26),
+            SizedBox(height: 26),
 
             // Input Saldo Nyata Sekarang
-            const Text(
+            Text(
               "MASUKKAN SALDO NYATA SEKARANG",
               style: TextStyle(
                 fontSize: 12,
@@ -339,13 +339,13 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                 letterSpacing: 0.8,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             TextField(
               controller: _balanceController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly, ThousandsSeparatorInputFormatter()],
               onChanged: (_) => setState(() {}),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
               decoration: InputDecoration(
                 hintText: CurrencyFormatter.formatRawDigits(widget.wallet.balance.toInt().toString()),
                 hintStyle: TextStyle(fontSize: 20, color: AppTheme.textLight.withOpacity(0.6), fontWeight: FontWeight.w500),
@@ -380,7 +380,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Real-time Difference Banner
             AnimatedContainer(
@@ -405,7 +405,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: (!isUserInputted || diff == 0)
-                          ? Colors.white
+                          ? (AppTheme.isDarkMode ? AppTheme.surfaceVariant : Colors.white)
                           : (diff > 0 ? AppTheme.incomeGreen.withOpacity(0.15) : AppTheme.expenseRed.withOpacity(0.15)),
                       shape: BoxShape.circle,
                     ),
@@ -419,7 +419,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                           : (diff > 0 ? AppTheme.incomeGreen : AppTheme.expenseRed),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,7 +438,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
                                 : (diff > 0 ? AppTheme.incomeGreen : AppTheme.expenseRed),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           (!isUserInputted || diff == 0)
                               ? 'Saldo nyata saat ini senilai dengan catatan sistem. Belum ada koreksi transaksi.'
@@ -458,7 +458,7 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Action Button
             SizedBox(
@@ -466,8 +466,8 @@ class _SesuaikanSaldoSheetState extends State<SesuaikanSaldoSheet> {
               height: 54,
               child: ElevatedButton.icon(
                 onPressed: _saveAdjustment,
-                icon: const Icon(Icons.task_alt_rounded, color: AppTheme.textOnPrimary, size: 22),
-                label: const Text(
+                icon: Icon(Icons.task_alt_rounded, color: AppTheme.textOnPrimary, size: 22),
+                label: Text(
                   "Simpan Penyesuaian Saldo",
                   style: TextStyle(
                     fontSize: 16,

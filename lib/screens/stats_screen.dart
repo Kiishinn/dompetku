@@ -80,7 +80,7 @@ class _StatsScreenState extends State<StatsScreen> {
           return Container(
             padding: const EdgeInsets.all(24),
             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppTheme.surface,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
@@ -91,7 +91,7 @@ class _StatsScreenState extends State<StatsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Pilih Rentang & Waktu',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                     ),
@@ -100,11 +100,11 @@ class _StatsScreenState extends State<StatsScreen> {
                         _useCurrentPeriod();
                         Navigator.pop(ctx);
                       },
-                      child: const Text('Hari/Bulan Ini', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                      child: Text('Hari/Bulan Ini', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
 
                 // Period Mode Segmented Selector (Harian, Mingguan, Bulanan, Tahunan)
                 Container(
@@ -160,7 +160,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Dynamic Picker Content with AnimatedSwitcher (Smooth 60/120fps transition)
                 AnimatedSwitcher(
@@ -193,8 +193,8 @@ class _StatsScreenState extends State<StatsScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Pilih Minggu dalam Bulan Ini:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-                              const SizedBox(height: 12),
+                              Text("Pilih Minggu dalam Bulan Ini:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                              SizedBox(height: 12),
                               Column(
                                 children: List.generate(4, (index) {
                                   final weekNum = index + 1;
@@ -223,7 +223,7 @@ class _StatsScreenState extends State<StatsScreen> {
                                           children: [
                                             Text("Minggu ke-$weekNum ($startDay - $endDay ${shortMonthNames[selectedMonth.month - 1]})",
                                                 style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.white : AppTheme.textPrimary)),
-                                            if (isSelected) const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                                            if (isSelected) Icon(Icons.check_circle, color: Colors.white, size: 20),
                                           ],
                                         ),
                                       ),
@@ -280,8 +280,8 @@ class _StatsScreenState extends State<StatsScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Pilih Tahun:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-                              const SizedBox(height: 12),
+                              Text("Pilih Tahun:", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                              SizedBox(height: 12),
                               Row(
                                 children: [2024, 2025, 2026, 2027].map((yr) {
                                   final isSelected = activePeriod == StatsPeriod.tahunan && selectedMonth.year == yr;
@@ -491,14 +491,14 @@ class _StatsScreenState extends State<StatsScreen> {
                             color: AppTheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.bar_chart,
                             color: AppTheme.primary,
                             size: 20,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
+                        SizedBox(width: 10),
+                        Text(
                           'Statistik Keuangan',
                           style: TextStyle(
                             fontSize: 22,
@@ -515,12 +515,12 @@ class _StatsScreenState extends State<StatsScreen> {
                         Container(
                           width: 40,
                           height: 40,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: AppTheme.surfaceContainer,
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.notifications_outlined,
                               color: AppTheme.primary,
                               size: 22,
@@ -534,13 +534,13 @@ class _StatsScreenState extends State<StatsScreen> {
                             top: 2,
                             child: Container(
                               padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: AppTheme.expenseRed,
                                 shape: BoxShape.circle,
                               ),
                               child: Text(
                                 '$unreadNotifCount',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -553,7 +553,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Unified Date Navigator Bar (< 📅 Juli 2026 >)
                 InkWell(
@@ -572,18 +572,18 @@ class _StatsScreenState extends State<StatsScreen> {
                         InkWell(
                           onTap: _previousPeriod,
                           borderRadius: BorderRadius.circular(20),
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(4),
                             child: Icon(Icons.chevron_left, color: AppTheme.primary, size: 22),
                           ),
                         ),
                         Row(
                           children: [
-                            const Icon(Icons.calendar_month, size: 18, color: AppTheme.primary),
-                            const SizedBox(width: 8),
+                            Icon(Icons.calendar_month, size: 18, color: AppTheme.primary),
+                            SizedBox(width: 8),
                             Text(
                               _getPeriodDisplayTitle(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.textPrimary,
@@ -594,7 +594,7 @@ class _StatsScreenState extends State<StatsScreen> {
                         InkWell(
                           onTap: _nextPeriod,
                           borderRadius: BorderRadius.circular(20),
-                          child: const Padding(
+                          child: Padding(
                             padding: EdgeInsets.all(4),
                             child: Icon(Icons.chevron_right, color: AppTheme.primary, size: 22),
                           ),
@@ -604,7 +604,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Net Cash Flow & Savings Rate Summary Card
                 Container(
@@ -631,32 +631,38 @@ class _StatsScreenState extends State<StatsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14),
                       Divider(color: AppTheme.outlineVariant.withOpacity(0.4)),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                totalIncome > 0
-                                    ? (savingsRate >= 20 ? Icons.stars : (savingsRate >= 0 ? Icons.info_outline : Icons.error_outline))
-                                    : (totalExpense > 0 ? Icons.account_balance_wallet_outlined : Icons.info_outline),
-                                size: 16,
-                                color: totalIncome > 0
-                                    ? (savingsRate >= 20 ? AppTheme.incomeGreen : (savingsRate >= 0 ? AppTheme.warningAmber : AppTheme.expenseRed))
-                                    : (totalExpense > 0 ? AppTheme.warningAmber : AppTheme.textSecondary),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                totalIncome > 0
-                                    ? "Rasio Tabungan (Savings Rate): ${savingsRate.toStringAsFixed(1)}%"
-                                    : (totalExpense > 0 ? "Rasio Tabungan: Tanpa Pemasukan" : "Rasio Tabungan: 0.0%"),
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
-                              ),
-                            ],
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(
+                                  totalIncome > 0
+                                      ? (savingsRate >= 20 ? Icons.stars : (savingsRate >= 0 ? Icons.info_outline : Icons.error_outline))
+                                      : (totalExpense > 0 ? Icons.account_balance_wallet_outlined : Icons.info_outline),
+                                  size: 16,
+                                  color: totalIncome > 0
+                                      ? (savingsRate >= 20 ? AppTheme.incomeGreen : (savingsRate >= 0 ? AppTheme.warningAmber : AppTheme.expenseRed))
+                                      : (totalExpense > 0 ? AppTheme.warningAmber : AppTheme.textSecondary),
+                                ),
+                                SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    totalIncome > 0
+                                        ? "Rasio Tabungan (Savings Rate): ${savingsRate.toStringAsFixed(1)}%"
+                                        : (totalExpense > 0 ? "Rasio Tabungan: Tanpa Pemasukan" : "Rasio Tabungan: 0.0%"),
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
@@ -685,7 +691,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ).animate().fadeIn().slideY(begin: 0.1, duration: 300.ms),
 
-                const SizedBox(height: 18),
+                SizedBox(height: 18),
 
                 // AI Financial Insights: Burn-Rate Alarm Card
                 Container(
@@ -711,7 +717,7 @@ class _StatsScreenState extends State<StatsScreen> {
                         ),
                         child: Icon(burnRateIcon, color: burnRateColor, size: 24),
                       ),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -725,14 +731,14 @@ class _StatsScreenState extends State<StatsScreen> {
                                 ),
                                 Text(
                                   "Proyeksi",
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               burnRateStatus,
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                             ),
                           ],
                         ),
@@ -741,7 +747,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ).animate().fadeIn().slideY(begin: 0.1, duration: 350.ms),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Toggle Tab (Pengeluaran vs Pemasukan) + Chart Type Selector
                 Row(
@@ -783,7 +789,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 // Analytics Key Metrics Cards (Rata-rata Harian & Peak Day)
                 Row(
@@ -799,17 +805,17 @@ class _StatsScreenState extends State<StatsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(activePeriod == StatsPeriod.harian ? "Total Hari Ini" : "Rata-rata / Hari", style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 4),
+                            Text(activePeriod == StatsPeriod.harian ? "Total Hari Ini" : "Rata-rata / Hari", style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
+                            SizedBox(height: 4),
                             Text(
                               CurrencyFormatter.format(dailyAverage),
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(14),
@@ -821,11 +827,11 @@ class _StatsScreenState extends State<StatsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(isExpenseMode ? "Pengeluaran Tertinggi" : "Pemasukan Tertinggi", style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 4),
+                            Text(isExpenseMode ? "Pengeluaran Tertinggi" : "Pemasukan Tertinggi", style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
+                            SizedBox(height: 4),
                             Text(
                               peakDayText != "-" ? "$peakDayText (${_formatShortCurrency(peakDayAmount)})" : "-",
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -836,7 +842,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 // Chart View (BarChart or LineChart) with RepaintBoundary
                 RepaintBoundary(
@@ -855,7 +861,7 @@ class _StatsScreenState extends State<StatsScreen> {
                           children: [
                             Text(
                               activeChartType == ChartType.bar ? "Grafik Perbandingan" : "Grafik Tren Waktu",
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                             ),
                             Text(
                               CurrencyFormatter.format(currentTotal),
@@ -863,7 +869,7 @@ class _StatsScreenState extends State<StatsScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         SizedBox(
                           height: 200,
                           child: activeChartType == ChartType.bar
@@ -875,7 +881,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ),
                 ).animate().fadeIn().slideY(begin: 0.1, duration: 400.ms),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // Ranked Category Allocation Section
                 Row(
@@ -883,16 +889,16 @@ class _StatsScreenState extends State<StatsScreen> {
                   children: [
                     Text(
                       isExpenseMode ? "Alokasi Pengeluaran" : "Sumber Pemasukan",
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                     ),
                     Text(
                       "${sortedCategories.length} Kategori",
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
 
                 if (sortedCategories.isEmpty)
                   Container(
@@ -904,7 +910,7 @@ class _StatsScreenState extends State<StatsScreen> {
                       boxShadow: AppTheme.cardShadow,
                     ),
                     child: Column(
-                      children: const [
+                      children: [
                         Icon(Icons.pie_chart_outline, size: 48, color: AppTheme.textLight),
                         SizedBox(height: 10),
                         Text(
@@ -956,18 +962,18 @@ class _StatsScreenState extends State<StatsScreen> {
                                         ),
                                         child: Icon(icon, color: color, size: 20),
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: 12),
                                       Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             catName,
-                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                                           ),
-                                          const SizedBox(height: 2),
+                                          SizedBox(height: 2),
                                           Text(
                                             "${percentage.toStringAsFixed(1)}% dari total",
-                                            style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                            style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                           ),
                                         ],
                                       ),
@@ -979,7 +985,7 @@ class _StatsScreenState extends State<StatsScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(4),
                                 child: LinearProgressIndicator(
@@ -996,7 +1002,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     ),
                   ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // Smart Financial Insights & Recommendations Card
                 if (sortedCategories.isNotEmpty && isExpenseMode) ...[
@@ -1017,14 +1023,14 @@ class _StatsScreenState extends State<StatsScreen> {
                             color: AppTheme.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.lightbulb_outline, color: AppTheme.primary, size: 24),
+                          child: Icon(Icons.lightbulb_outline, color: AppTheme.primary, size: 24),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 "Analisis Finansial Cerdas",
                                 style: TextStyle(
                                   fontSize: 15,
@@ -1032,20 +1038,20 @@ class _StatsScreenState extends State<StatsScreen> {
                                   color: AppTheme.primary,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              SizedBox(height: 6),
                               RichText(
                                 text: TextSpan(
-                                  style: const TextStyle(fontSize: 13, color: AppTheme.textPrimary, height: 1.4, fontFamily: 'Inter'),
+                                  style: TextStyle(fontSize: 13, color: AppTheme.textPrimary, height: 1.4, fontFamily: 'Inter'),
                                   children: [
                                     const TextSpan(text: "Pengeluaran terbesar Anda pada "),
                                     TextSpan(
                                       text: _getPeriodDisplayTitle(),
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
                                     ),
                                     const TextSpan(text: " ada pada kategori "),
                                     TextSpan(
                                       text: "[${sortedCategories.first.key}]",
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
                                     ),
                                     TextSpan(
                                       text: " sebesar ${CurrencyFormatter.format(sortedCategories.first.value)} (${((sortedCategories.first.value / (currentTotal > 0 ? currentTotal : 1)) * 100).toStringAsFixed(0)}% dari total).",
@@ -1054,7 +1060,7 @@ class _StatsScreenState extends State<StatsScreen> {
                                 ),
                               ),
                               if (projectedMonthTotal > currentTotal && activePeriod == StatsPeriod.bulanan) ...[
-                                const SizedBox(height: 10),
+                                SizedBox(height: 10),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   decoration: BoxDecoration(
@@ -1064,12 +1070,12 @@ class _StatsScreenState extends State<StatsScreen> {
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.trending_up, color: AppTheme.expenseRed, size: 16),
-                                      const SizedBox(width: 8),
+                                      Icon(Icons.trending_up, color: AppTheme.expenseRed, size: 16),
+                                      SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
                                           "Estimasi pengeluaran Anda hingga akhir bulan ini diproyeksikan mencapai ${CurrencyFormatter.format(projectedMonthTotal)}.",
-                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.expenseRed),
+                                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.expenseRed),
                                         ),
                                       ),
                                     ],
@@ -1084,7 +1090,7 @@ class _StatsScreenState extends State<StatsScreen> {
                   ).animate().fadeIn().slideY(begin: 0.1, duration: 500.ms),
                 ],
 
-                const SizedBox(height: 100),
+                SizedBox(height: 100),
               ],
             ),
           ),
@@ -1099,11 +1105,11 @@ class _StatsScreenState extends State<StatsScreen> {
         Row(
           children: [
             Icon(icon, color: color, size: 14),
-            const SizedBox(width: 4),
-            Text(label, style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
+            SizedBox(width: 4),
+            Text(label, style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
           ],
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color),
@@ -1178,7 +1184,7 @@ class _StatsScreenState extends State<StatsScreen> {
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
                 CurrencyFormatter.format(rod.toY),
-                const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
               );
             },
           ),
@@ -1207,7 +1213,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     ),
                   );
                 }
-                return const Text('');
+                return Text('');
               },
             ),
           ),
@@ -1302,7 +1308,7 @@ class _StatsScreenState extends State<StatsScreen> {
                     ),
                   );
                 }
-                return const Text('');
+                return Text('');
               },
             ),
           ),

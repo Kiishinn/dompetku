@@ -10,7 +10,8 @@ class RecurringBillModel {
   final String repeatInterval; // 'Bulanan', 'Mingguan', 'Tahunan'
   bool isActive;
   final IconData icon;
-  final Color color;
+  final Color _color;
+  Color get color => AppTheme.getAdaptiveColor(_color);
 
   RecurringBillModel({
     required this.id,
@@ -21,8 +22,8 @@ class RecurringBillModel {
     this.repeatInterval = 'Bulanan',
     this.isActive = true,
     this.icon = Icons.receipt_long_outlined,
-    this.color = AppTheme.primary,
-  });
+    Color color = AppTheme.defaultPrimary,
+  }) : _color = color;
 
   Map<String, dynamic> toJson() {
     return {
@@ -34,7 +35,7 @@ class RecurringBillModel {
       'repeatInterval': repeatInterval,
       'isActive': isActive,
       'iconCodePoint': icon.codePoint,
-      'colorValue': color.value,
+      'colorValue': _color.value,
     };
   }
 

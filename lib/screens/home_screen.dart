@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppTheme.primary,
               onPrimary: Colors.white,
               surface: AppTheme.surface,
@@ -181,14 +181,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: AppTheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.account_balance_wallet,
                               color: AppTheme.primary,
                               size: 20,
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          const Text(
+                          SizedBox(width: 10),
+                          Text(
                             'Beranda',
                             style: TextStyle(
                               fontSize: 22,
@@ -205,12 +205,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           Container(
                             width: 40,
                             height: 40,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: AppTheme.surfaceContainer,
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.notifications_outlined,
                                 color: AppTheme.primary,
                                 size: 22,
@@ -224,13 +224,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               top: 2,
                               child: Container(
                                 padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: AppTheme.expenseRed,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Text(
                                   '$unreadNotifCount',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -252,17 +252,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
 
                       // Interactive Swipeable Wallet Carousel Card (Sultan Fintech Tier-1)
                       const WalletCarouselCard(),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
 
                       // Filter Periode Selector Pills (Hari Ini, 7 Hari, Bulan Ini, Tahun Ini, Semua, Pilih Tanggal...)
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             "Periode:",
                             style: TextStyle(
                               fontSize: 13,
@@ -270,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: AppTheme.textSecondary,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Expanded(
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
@@ -331,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             children: [
                                               if (icon != null) ...[
                                                 Icon(icon, size: 14, color: isSel ? Colors.white : AppTheme.primary),
-                                                const SizedBox(width: 4),
+                                                SizedBox(width: 4),
                                               ],
                                               Text(
                                                 label,
@@ -354,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14),
 
                       // Income & Expense Summary Cards
                       Row(
@@ -379,14 +379,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           color: AppTheme.incomeGreen.withOpacity(0.15),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.arrow_downward,
                                           color: AppTheme.incomeGreen,
                                           size: 18,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      const Text(
+                                      SizedBox(width: 8),
+                                      Text(
                                         'Pemasukan',
                                         style: TextStyle(
                                           fontSize: 13,
@@ -396,10 +396,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: 10),
                                   Text(
                                     appState.isBalanceHidden ? 'Rp ••••••' : CurrencyFormatter.format(periodIncome, showPrefix: true),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w700,
                                       color: AppTheme.textPrimary,
@@ -409,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16),
                           Expanded(
                             child: Container(
                               padding: const EdgeInsets.all(16),
@@ -430,14 +430,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           color: AppTheme.expenseRed.withOpacity(0.15),
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.arrow_upward,
                                           color: AppTheme.expenseRed,
                                           size: 18,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      const Text(
+                                      SizedBox(width: 8),
+                                      Text(
                                         'Pengeluaran',
                                         style: TextStyle(
                                           fontSize: 13,
@@ -447,10 +447,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: 10),
                                   Text(
                                     appState.isBalanceHidden ? 'Rp ••••••' : CurrencyFormatter.format(periodExpense, showPrefix: true),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.w700,
                                       color: AppTheme.textPrimary,
@@ -463,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
 
                       // Dedicated Category Budget Progress Tracker Section
                       Container(
@@ -482,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
-                                  children: const [
+                                  children: [
                                     Icon(Icons.pie_chart_outline, color: AppTheme.primary, size: 20),
                                     SizedBox(width: 8),
                                     Text(
@@ -497,7 +497,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 InkWell(
                                   onTap: () => AturAnggaranSheet.show(context),
-                                  child: const Text(
+                                  child: Text(
                                     'Kelola',
                                     style: TextStyle(
                                       fontSize: 13,
@@ -508,10 +508,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: 14),
 
                             if (categoryBudgets.isEmpty)
-                              const Text(
+                              Text(
                                 "Belum ada limit anggaran kategori diset. Tekan Kelola untuk mengatur.",
                                 style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                               )
@@ -543,7 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: [
                                             Text(
                                               catName,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppTheme.textPrimary,
@@ -561,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 6),
+                                        SizedBox(height: 6),
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(4),
                                           child: LinearProgressIndicator(
@@ -571,17 +571,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                             valueColor: AlwaysStoppedAnimation<Color>(barColor),
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        SizedBox(height: 4),
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               "Terpakai Rp ${CurrencyFormatter.formatRawDigits(spent.toInt().toString())} ($percentInt%)",
-                                              style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                              style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                             ),
                                             Text(
                                               "Limit Rp ${CurrencyFormatter.formatRawDigits(limit.toInt().toString())}",
-                                              style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                                              style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                             ),
                                           ],
                                         ),
@@ -594,13 +594,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       // Recent Transactions Header
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Transaksi Terakhir',
                             style: TextStyle(
                               fontSize: 18,
@@ -630,7 +630,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 minimumSize: const Size(0, 0),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Lihat Semua',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -641,7 +641,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -732,14 +732,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   if (dayIncome > 0)
                                                     Text(
                                                       '+${CurrencyFormatter.format(dayIncome)}',
-                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.incomeGreen),
+                                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.incomeGreen),
                                                     ),
                                                   if (dayIncome > 0 && dayExpense > 0)
-                                                    const Text(' / ', style: TextStyle(fontSize: 10, color: AppTheme.textLight)),
+                                                    Text(' / ', style: TextStyle(fontSize: 10, color: AppTheme.textLight)),
                                                   if (dayExpense > 0)
                                                     Text(
                                                       '-${CurrencyFormatter.format(dayExpense)}',
-                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.expenseRed),
+                                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.expenseRed),
                                                     ),
                                                 ],
                                               ),
@@ -789,11 +789,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-                                            const Icon(Icons.expand_more_rounded, color: AppTheme.primary, size: 20),
-                                            const SizedBox(width: 6),
+                                            Icon(Icons.expand_more_rounded, color: AppTheme.primary, size: 20),
+                                            SizedBox(width: 6),
                                             Text(
                                               'Muat Lebih Banyak (${totalGroups - _visibleGroupCount} grup lagi)',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.bold,
                                                 color: AppTheme.primary,
